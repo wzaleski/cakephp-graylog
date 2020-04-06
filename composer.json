@@ -1,0 +1,16 @@
+{
+    "name": "kba-team/cakephp-graylog",
+    "description": "Graylog engine for CakePHP",
+    "type": "cakephp-plugin",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^5.5|^7.0",
+        "ext-json": "*",
+        "cakephp/cakephp": "^2.4",
+        "graylog2/gelf-php": "^1.6"
+    },
+    "extra": {
+        "installer-name": "Graylog"
+    }
+}
