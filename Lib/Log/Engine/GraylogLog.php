@@ -190,7 +190,12 @@ class GraylogLog extends BaseLog
      */
     private function createMessage($type, $message)
     {
-        $gelfMessage = new GelfMessage();
+        $gelfMessage = (new GelfMessage())
+            ->setVersion('1.1')
+            ->setLevel($type)
+            ->setFacility($this->_config['facility'])
+            ->setAdditional('http_referer', Hash::get($_SERVER, 'HTTP_REFERER'))
+            ->setAdditional('request_uri', Hash::get($_SERVER, 'REQUEST_URI'));
 
         /**
          * Append POST variables to message.
@@ -223,13 +228,15 @@ class GraylogLog extends BaseLog
          */
         $shortMessage = strtok($message, "\r\n");
 
-        return $gelfMessage->setVersion('1.1')
+        /**
+         * Send only the short message in case short and full message are the same.
+         */
+        if ($shortMessage === $message) {
+            return $gelfMessage->setShortMessage($shortMessage);
+        }
+        return $gelfMessage
             ->setShortMessage($shortMessage)
-            ->setFullMessage($message)
-            ->setLevel($type)
-            ->setFacility($this->_config['facility'])
-            ->setAdditional('http_referer', Hash::get($_SERVER, 'HTTP_REFERER'))
-            ->setAdditional('request_uri', Hash::get($_SERVER, 'REQUEST_URI'));
+            ->setFullMessage($message);
     }
 
     /**
