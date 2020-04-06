@@ -8,7 +8,7 @@ use Gelf\Transport\TransportInterface;
 use Gelf\Transport\UdpTransport;
 use Psr\Log\LogLevel;
 
-App::uses('Baselog', 'Log/Engine');
+App::uses('BaseLog', 'Log/Engine');
 
 /**
  * Class GraylogLog
