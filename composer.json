@@ -12,5 +12,18 @@
     },
     "extra": {
         "installer-name": "Graylog"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8"
+    },
+    "autoload-dev": {
+        "classmap": [
+            "vendor/cakephp/cakephp/lib/Cake/Core/App.php",
+            "vendor/cakephp/cakephp/lib/Cake/Log/CakeLogInterface.php",
+            "vendor/cakephp/cakephp/lib/Cake/Log/Engine/BaseLog.php",
+            "vendor/cakephp/cakephp/lib/Cake/Utility/Hash.php",
+            "Lib/Log/Engine/GraylogLog.php",
+            "tests/PublicGraylogLog.php"
+        ]
     }
 }
