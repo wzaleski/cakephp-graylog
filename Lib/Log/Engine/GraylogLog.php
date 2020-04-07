@@ -224,7 +224,7 @@ class GraylogLog extends BaseLog
             /**
              * Append backtrace to message.
              */
-            $message .= PHP_EOL . PHP_EOL . 'The backtrace:' . PHP_EOL;
+            $message .= PHP_EOL . PHP_EOL . 'Stack Trace:' . PHP_EOL;
             $message .= $trace;
         }
 
