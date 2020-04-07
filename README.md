@@ -5,7 +5,7 @@
 [![Maintainability][maintainability-badge]][maintainability]
 [![Test Coverage][coverage-badge]][coverage]
 
-Graylog engine for CakePHP 2.x
+Graylog log engine for CakePHP 2.x
 
 ## Usage
 
