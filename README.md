@@ -19,6 +19,7 @@ CakeLog::config('graylog', [
     'types' => ['warning', 'error', 'critical', 'alert', 'emergency'],
     'host' => 'graylog.example.com',
     'facility' => 'MyAppName',
+    'append_backtrace' => true,
     'append_session' => true,
     'append_post' => true
 ]);

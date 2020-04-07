@@ -26,6 +26,7 @@ class GraylogLog extends BaseLog
         'chunk_size' => UdpTransport::CHUNK_SIZE_LAN,
         'ssl_options' => null,
         'facility' => 'CakePHP',
+        'append_backtrace' => true,
         'append_session' => true,
         'append_post' => true,
         'password_keys' => [
@@ -198,10 +199,40 @@ class GraylogLog extends BaseLog
             ->setAdditional('request_uri', Hash::get($_SERVER, 'REQUEST_URI'));
 
         /**
+         * Append backtrace in case it's not already in the message.
+         */
+        if ($this->_config['append_backtrace'] === true
+            && strpos($message, 'Stack Trace:') === false
+        ) {
+            ob_start();
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            $trace = ob_get_clean();
+            /**
+             * Cut away the last three calls (i.e. the first three lines).
+             */
+            $trace = implode(PHP_EOL, array_slice(explode(PHP_EOL, $trace), 3));
+            /**
+             * Renumber trace steps.
+             */
+            $trace = preg_replace_callback(
+                '/^#(\d+)/m',
+                function ($matches) {
+                    return '#' . ($matches[1] - 3);
+                },
+                $trace
+            );
+            /**
+             * Append backtrace to message.
+             */
+            $message .= PHP_EOL . PHP_EOL . 'The backtrace:' . PHP_EOL;
+            $message .= $trace;
+        }
+
+        /**
          * Append POST variables to message.
          */
-        if (!empty($_POST) && $this->_config['append_post']) {
-            $message .= PHP_EOL . PHP_EOL . 'POST:';
+        if ($this->_config['append_post'] === true && !empty($_POST)) {
+            $message .= PHP_EOL . PHP_EOL . 'POST:' . PHP_EOL;
             $message .= json_encode(
                 $this->obscurePasswords($_POST),
                 JSON_PRETTY_PRINT
@@ -211,9 +242,9 @@ class GraylogLog extends BaseLog
         /**
          * Append session variables to message.
          */
-        if (isset($_SESSION)
+        if ($this->_config['append_session'] === true
+            && isset($_SESSION)
             && !empty($_SESSION)
-            && $this->_config['append_session']
         ) {
             $message .= PHP_EOL . PHP_EOL . 'Session:' . PHP_EOL;
             $message .= json_encode(
