@@ -41,7 +41,7 @@ class GraylogLog extends BaseLog
     /**
      * @var array Array of allowed log level types.
      */
-    private static $allowedTypes = [
+    protected static $allowedTypes = [
         LogLevel::EMERGENCY,
         LogLevel::ALERT,
         LogLevel::CRITICAL,
@@ -189,7 +189,7 @@ class GraylogLog extends BaseLog
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    private function createMessage($type, $message)
+    protected function createMessage($type, $message)
     {
         $gelfMessage = (new GelfMessage())
             ->setVersion('1.1')
