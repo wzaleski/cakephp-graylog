@@ -10,7 +10,7 @@ Graylog engine for CakePHP 2.x
 ## Usage
 
 ```bash
-composer require kba-team/cakephp-graylog:dev-master
+composer require kba-team/cakephp-graylog
 ```
 
 ```php
@@ -26,6 +26,20 @@ CakeLog::config('graylog', [
     'append_post' => true
 ]);
 ```
+
+Possible configuration parameters are:
+* `scheme` Currently TCP or UDP connections to Graylog are supported. Default: `udp`
+* `host` The hostname of the Graylog server. Default: `127.0.0.1`
+* `port` The port, the Graylog server listens to. Default: `12201`
+* `url` A connection URL in format `<scheme>://<host>:<port>`. This will overwrite any other settings.
+* `chunk_size` The size of the UDP packages. Default: `\Gelf\Transport\UdpTransport::CHUNK_SIZE_LAN`
+* `ssl_options` An instance of `\Gelf\Transport\SslOptions` defining SSL settings for TCP connections. Default: `null`
+* `facility` The logging facility. Default: `CakePHP`.
+* `append_backtrace` Append a backtrace to the message? Default: `true`
+* `append_session` Append the contents of the session to the message? Passwords will be removed according to the list in `password_keys`. Default: `true`
+* `append_post` Append the POST parameters to the message? Passwords will be removed according to the list in `password_keys`. Default: `true`
+* `password_keys` The values of these keys in the session and post array will be replaced by `********`. Default: `['password', 'new_password', 'old_password', 'current_password']`
+* `types` Array of log types, that will be sent to Graylog. See `\Psr\Log\LogLevel` for all possible values. Default: all of them.
 
 ### Further reading
 
