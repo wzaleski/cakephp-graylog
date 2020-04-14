@@ -2,7 +2,7 @@
 
 [![License: MIT][license-mit]](LICENSE)
 [![Packagist Version][packagist-badge]][packagist]
-[![Build Status][build-status-master]][travis-ci]
+[![Build Status][build-status-cake2]][travis-ci]
 [![Maintainability][maintainability-badge]][maintainability]
 [![Test Coverage][coverage-badge]][coverage]
 
@@ -52,7 +52,7 @@ Possible configuration parameters are:
 [packagist-badge]: https://img.shields.io/packagist/v/kba-team/cakephp-graylog
 [packagist]: https://packagist.org/packages/kba-team/cakephp-graylog
 [travis-ci]: https://travis-ci.org/the-kbA-team/cakephp-graylog
-[build-status-master]: https://api.travis-ci.org/the-kbA-team/cakephp-graylog.svg?branch=master
+[build-status-cake2]: https://api.travis-ci.org/the-kbA-team/cakephp-graylog.svg?branch=cake2
 [maintainability-badge]: https://api.codeclimate.com/v1/badges/04abc6d1562d5f628f8a/maintainability
 [maintainability]: https://codeclimate.com/github/the-kbA-team/cakephp-graylog/maintainability
 [coverage-badge]: https://api.codeclimate.com/v1/badges/04abc6d1562d5f628f8a/test_coverage
