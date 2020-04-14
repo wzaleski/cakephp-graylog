@@ -12,7 +12,9 @@ App::uses('BaseLog', 'Log/Engine');
 
 /**
  * Class GraylogLog
- * @author Gregor Joham <gregor.joham@knorr-bremse.com>
+ * @author  Gregor J.
+ * @license MIT
+ * @link    https://github.com/the-kbA-team/cakephp-graylog.git Repository
  */
 class GraylogLog extends BaseLog
 {
