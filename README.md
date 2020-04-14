@@ -5,7 +5,7 @@
 [![Maintainability][maintainability-badge]][maintainability]
 [![Test Coverage][coverage-badge]][coverage]
 
-Graylog log engine for CakePHP 2.x
+Graylog log engine for CakePHP 3.x
 
 ## Usage
 
@@ -15,10 +15,9 @@ composer require kba-team/cakephp-graylog
 
 ```php
 <?php
-CakePlugin::load('Graylog');
-CakeLog::config('graylog', [
-    'engine' => 'Graylog.Graylog',
-    'types' => ['warning', 'error', 'critical', 'alert', 'emergency'],
+\Cake\Core\Configure::write('Log.graylog', [
+    'className' => \kbATeam\CakePhpGraylog\Log\Engine\GraylogLog::class,
+    'levels' => ['notice', 'info', 'debug', 'warning', 'error', 'critical', 'alert', 'emergency'],
     'host' => 'graylog.example.com',
     'facility' => 'MyAppName',
     'append_backtrace' => true,
@@ -39,7 +38,7 @@ Possible configuration parameters are:
 * `append_session` Append the contents of the session to the message? Passwords will be removed according to the list in `password_keys`. Default: `true`
 * `append_post` Append the POST parameters to the message? Passwords will be removed according to the list in `password_keys`. Default: `true`
 * `password_keys` The values of these keys in the session and post array will be replaced by `********`. Default: `['password', 'new_password', 'old_password', 'current_password']`
-* `types` Array of log types, that will be sent to Graylog. See `\Psr\Log\LogLevel` for all possible values. Default: all of them.
+* `levels` Array of log level, that will be sent to Graylog. See `\Psr\Log\LogLevel` for all possible values. Default: all of them.
 
 ### Further reading
 
