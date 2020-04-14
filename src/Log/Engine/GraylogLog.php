@@ -1,18 +1,23 @@
 <?php
 
+namespace kbATeam\CakePhpGraylog\Log\Engine;
+
+use Cake\Log\Engine\BaseLog;
+use Cake\Utility\Hash;
 use Gelf\Message as GelfMessage;
 use Gelf\Publisher;
 use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\TransportInterface;
 use Gelf\Transport\UdpTransport;
+use LogicException;
 use Psr\Log\LogLevel;
-
-App::uses('BaseLog', 'Log/Engine');
 
 /**
  * Class GraylogLog
- * @author Gregor Joham <gregor.joham@knorr-bremse.com>
+ * @author Gregor J.
+ * @license MIT
+ * @link    https://github.com/the-kbA-team/cakephp-graylog.git Repository
  */
 class GraylogLog extends BaseLog
 {
@@ -35,13 +40,13 @@ class GraylogLog extends BaseLog
             'old_password',
             'current_password'
         ],
-        'types' => []
+        'levels' => []
     ];
 
     /**
-     * @var array Array of allowed log level types.
+     * @var array Array of allowed log levels.
      */
-    protected static $allowedTypes = [
+    protected static $allowedLevels = [
         LogLevel::EMERGENCY,
         LogLevel::ALERT,
         LogLevel::CRITICAL,
@@ -88,47 +93,50 @@ class GraylogLog extends BaseLog
          */
         $config['scheme'] = strtolower($config['scheme']);
         /**
-         * Ensure that the types array actually is an array.
+         * Ensure that the levels array actually is an array.
          */
-        if (!is_array($config['types'])) {
-            $config['types'] = [];
+        if (!is_array($config['levels'])) {
+            $config['levels'] = [];
         }
         /**
-         * Remove all types that are not PSR-3.
+         * Remove all levels that are not PSR-3.
          */
-        foreach ($config['types'] as $key => $type) {
-            if (!in_array($type, static::$allowedTypes, true)) {
-                unset($config['types'][$key]);
+        foreach ($config['levels'] as $key => $level) {
+            if (!in_array($level, static::$allowedLevels, true)) {
+                unset($config['levels'][$key]);
             }
         }
         /**
-         * Enable all types in case types are empty.
+         * Enable all levels in case levels are empty.
          */
-        if ($config['types'] === []) {
-            $config['types'] = static::$allowedTypes;
+        if ($config['levels'] === []) {
+            $config['levels'] = static::$allowedLevels;
         }
         parent::__construct($config);
     }
 
     /**
-     * Write method to handle writes being made to the Logger
+     * Logs with an arbitrary level.
      *
-     * @param string $type    Message type.
-     * @param string $message Message to write.
+     * @param mixed   $level
+     * @param string  $message
+     * @param mixed[] $context
+     *
      * @return void
-     * @throws \InvalidArgumentException
+     *
+     * @throws \Psr\Log\InvalidArgumentException
      * @throws \LogicException
      * @throws \RuntimeException
      */
-    public function write($type, $message)
+    public function log($level, $message, array $context = [])
     {
         /**
-         * Do not continue unless this engine is supposed to log this type of
+         * Do not continue unless this engine is supposed to log this level of
          * message.
          */
-        if (in_array($type, $this->_config['types'], true)) {
+        if (in_array($level, $this->_config['levels'], true)) {
             $this->getPublisher()->publish(
-                $this->createMessage($type, $message)
+                $this->createMessage($level, $message)
             );
         }
     }
@@ -160,7 +168,7 @@ class GraylogLog extends BaseLog
     /**
      * Initialize the transport class for sending greylog messages.
      * @return TransportInterface
-     * @throws LogicException
+     * @throws \LogicException
      */
     private function initTransport()
     {
@@ -183,17 +191,17 @@ class GraylogLog extends BaseLog
 
     /**
      * Create a GELF message.
-     * @param string $type    Message type.
+     * @param string $level   Message level.
      * @param string $message Message to write.
      * @return GelfMessage
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function createMessage($type, $message)
+    protected function createMessage($level, $message)
     {
         $gelfMessage = (new GelfMessage())
             ->setVersion('1.1')
-            ->setLevel($type)
+            ->setLevel($level)
             ->setFacility($this->_config['facility'])
             ->setAdditional('http_referer', Hash::get($_SERVER, 'HTTP_REFERER'))
             ->setAdditional('request_uri', Hash::get($_SERVER, 'REQUEST_URI'));
@@ -216,7 +224,7 @@ class GraylogLog extends BaseLog
              */
             $trace = preg_replace_callback(
                 '/^#(\d+)/m',
-                function ($matches) {
+                static function ($matches) {
                     return '#' . ($matches[1] - 3);
                 },
                 $trace

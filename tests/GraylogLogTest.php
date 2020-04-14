@@ -1,11 +1,18 @@
 <?php
 
+namespace Tests\kbATeam\CakePhpGraylog;
+
+use Cake\Log\Engine\BaseLog;
 use Gelf\Message as GelfMessage;
 use Gelf\Publisher;
 use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\UdpTransport;
+use kbATeam\CakePhpGraylog\Log\Engine\GraylogLog;
+use PHPUnit_Framework_TestCase;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use stdClass;
 
 /**
  * Class GraylogLogTest
@@ -18,7 +25,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
     public function testInheritance()
     {
         $log = new PublicGraylogLog();
-        static::assertInstanceOf(CakeLogInterface::class, $log);
+        static::assertInstanceOf(LoggerInterface::class, $log);
         static::assertInstanceOf(BaseLog::class, $log);
         static::assertInstanceOf(GraylogLog::class, $log);
     }
@@ -29,21 +36,21 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
     public function testDefaultConfig()
     {
         $log = new PublicGraylogLog();
-        static::assertSame('udp', $log->getConfig('scheme'));
-        static::assertSame('127.0.0.1', $log->getConfig('host'));
-        static::assertSame(12201, $log->getConfig('port'));
-        static::assertSame(UdpTransport::CHUNK_SIZE_LAN, $log->getConfig('chunk_size'));
-        static::assertNull($log->getConfig('ssl_options'));
-        static::assertSame('CakePHP', $log->getConfig('facility'));
-        static::assertTrue($log->getConfig('append_backtrace'));
-        static::assertTrue($log->getConfig('append_session'));
-        static::assertTrue($log->getConfig('append_post'));
+        static::assertSame('udp', $log->getMyConfig('scheme'));
+        static::assertSame('127.0.0.1', $log->getMyConfig('host'));
+        static::assertSame(12201, $log->getMyConfig('port'));
+        static::assertSame(UdpTransport::CHUNK_SIZE_LAN, $log->getMyConfig('chunk_size'));
+        static::assertNull($log->getMyConfig('ssl_options'));
+        static::assertSame('CakePHP', $log->getMyConfig('facility'));
+        static::assertTrue($log->getMyConfig('append_backtrace'));
+        static::assertTrue($log->getMyConfig('append_session'));
+        static::assertTrue($log->getMyConfig('append_post'));
         static::assertSame([
             'password',
             'new_password',
             'old_password',
             'current_password'
-        ], $log->getConfig('password_keys'));
+        ], $log->getMyConfig('password_keys'));
         static::assertSame([
             LogLevel::EMERGENCY,
             LogLevel::ALERT,
@@ -53,7 +60,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
             LogLevel::NOTICE,
             LogLevel::INFO,
             LogLevel::DEBUG
-        ], $log->getConfig('types'));
+        ], $log->getMyConfig('levels'));
     }
 
     /**
@@ -62,7 +69,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
     public function testValidSslOptions()
     {
         $log = new PublicGraylogLog(['ssl_options' => new SslOptions()]);
-        static::assertInstanceOf(SslOptions::class, $log->getConfig('ssl_options'));
+        static::assertInstanceOf(SslOptions::class, $log->getMyConfig('ssl_options'));
     }
 
     /**
@@ -91,7 +98,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
     public function testInvalidSslOptions($option)
     {
         $log = new PublicGraylogLog(['ssl_options' => $option]);
-        static::assertNull($log->getConfig('ssl_options'));
+        static::assertNull($log->getMyConfig('ssl_options'));
     }
 
     /**
@@ -119,25 +126,25 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
     public function testConnectionUrl($url, $scheme, $host, $port)
     {
         $log = new PublicGraylogLog(['url' => $url]);
-        static::assertSame($scheme, $log->getConfig('scheme'));
-        static::assertSame($host, $log->getConfig('host'));
-        static::assertSame($port, $log->getConfig('port'));
+        static::assertSame($scheme, $log->getMyConfig('scheme'));
+        static::assertSame($host, $log->getMyConfig('host'));
+        static::assertSame($port, $log->getMyConfig('port'));
     }
 
     /**
-     * Test setting only certain log types.
+     * Test setting only certain log levels.
      */
-    public function testSettingLogTypes()
+    public function testSettingLogLevels()
     {
-        $log = new PublicGraylogLog(['types' => ['error', 'warning', 'i5A64FtlPt']]);
-        static::assertSame(['error', 'warning'], $log->getConfig('types'));
+        $log = new PublicGraylogLog(['levels' => ['error', 'warning', 'i5A64FtlPt']]);
+        static::assertSame(['error', 'warning'], $log->getMyConfig('levels'));
     }
 
     /**
-     * Data provider of invalid log types.
+     * Data provider of invalid log levels.
      * @return array
      */
-    public static function provideInvalidLogTypes()
+    public static function provideInvalidLogLevels()
     {
         return [
             [['vUBTx40Vjr', 'WLWCTyCihX', 152, 4.256, true, false, null, ['debug'], new stdClass()]],
@@ -152,13 +159,13 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test setting only invalid log types resulting in enabling all log types.
-     * @param mixed $types
-     * @dataProvider provideInvalidLogTypes
+     * Test setting only invalid log levels resulting in enabling all log levels.
+     * @param mixed $levels
+     * @dataProvider provideInvalidLogLevels
      */
-    public function testInvalidLogTypes($types)
+    public function testInvalidLogLevels($levels)
     {
-        $log = new PublicGraylogLog(['types' => $types]);
+        $log = new PublicGraylogLog(['levels' => $levels]);
         static::assertSame([
             LogLevel::EMERGENCY,
             LogLevel::ALERT,
@@ -168,7 +175,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
             LogLevel::NOTICE,
             LogLevel::INFO,
             LogLevel::DEBUG
-        ], $log->getConfig('types'));
+        ], $log->getMyConfig('levels'));
     }
 
     /**

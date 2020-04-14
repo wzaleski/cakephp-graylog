@@ -1,5 +1,10 @@
 <?php
 
+namespace Tests\kbATeam\CakePhpGraylog;
+
+use kbATeam\CakePhpGraylog\Log\Engine\GraylogLog;
+use Cake\Utility\Hash;
+
 /**
  * Class PublicGraylogLog
  * Class with the sole purpose to make the config array public for testing.
@@ -11,7 +16,7 @@ class PublicGraylogLog extends GraylogLog
      * @param string $key
      * @return array|mixed
      */
-    public function getConfig($key = null)
+    public function getMyConfig($key = null)
     {
         if ($key === null) {
             return $this->_config;
@@ -38,9 +43,9 @@ class PublicGraylogLog extends GraylogLog
     /**
      * @inheritDoc
      */
-    public function createMessage($type, $message)
+    public function createMessage($level, $message)
     {
-        return parent::createMessage($type, $message);
+        return parent::createMessage($level, $message);
     }
 
     /**

@@ -42,10 +42,11 @@ namespace Gelf {
     }
 }
 
-namespace {
+namespace Tests\kbATeam\CakePhpGraylog {
 
     use Gelf\Message as GelfMessage;
     use Gelf\Transport\UdpTransport;
+    use PHPUnit_Framework_TestCase;
 
     /**
      * Class GraylogWriteTest
@@ -70,7 +71,7 @@ namespace {
              */
             static::assertInstanceOf(UdpTransport::class, $publisher->transport);
             static::assertNull($publisher->message);
-            $log->write('error', 'P5oUZLqcjx');
+            $log->log('error', 'P5oUZLqcjx');
             static::assertInstanceOf(GelfMessage::class, $publisher->message);
             static::assertSame('CakePHP', $publisher->message->getFacility());
             static::assertSame('error', $publisher->message->getLevel());

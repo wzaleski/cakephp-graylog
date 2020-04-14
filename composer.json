@@ -7,23 +7,23 @@
     "require": {
         "php": "^5.5|^7.0",
         "ext-json": "*",
-        "cakephp/cakephp": "^2.4",
+        "cakephp/cakephp": "3.6.15",
         "graylog2/gelf-php": "^1.6"
     },
     "extra": {
         "installer-name": "Graylog"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8"
+        "phpunit/phpunit": "^5.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "kbATeam\\CakePhpGraylog\\": "src/"
+        }
     },
     "autoload-dev": {
-        "classmap": [
-            "vendor/cakephp/cakephp/lib/Cake/Core/App.php",
-            "vendor/cakephp/cakephp/lib/Cake/Log/CakeLogInterface.php",
-            "vendor/cakephp/cakephp/lib/Cake/Log/Engine/BaseLog.php",
-            "vendor/cakephp/cakephp/lib/Cake/Utility/Hash.php",
-            "Lib/Log/Engine/GraylogLog.php",
-            "tests/PublicGraylogLog.php"
-        ]
+        "psr-4": {
+            "Tests\\kbATeam\\CakePhpGraylog\\": "tests/"
+        }
     }
 }
