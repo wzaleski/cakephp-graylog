@@ -1,6 +1,7 @@
 # CakePHP Graylog
 
 [![License: MIT][license-mit]](LICENSE)
+[![Packagist Version][packagist-badge]][packagist]
 [![Build Status][build-status-master]][travis-ci]
 [![Maintainability][maintainability-badge]][maintainability]
 [![Test Coverage][coverage-badge]][coverage]
@@ -47,6 +48,8 @@ Possible configuration parameters are:
 * About [Graylog Extended Log Format (GELF)](https://docs.graylog.org/en/3.1/pages/gelf.html)
 
 [license-mit]: https://img.shields.io/badge/license-MIT-blue.svg
+[packagist-badge]: https://img.shields.io/packagist/v/kba-team/cakephp-graylog
+[packagist]: https://packagist.org/packages/kba-team/cakephp-graylog
 [travis-ci]: https://travis-ci.org/the-kbA-team/cakephp-graylog
 [build-status-master]: https://api.travis-ci.org/the-kbA-team/cakephp-graylog.svg?branch=master
 [maintainability-badge]: https://api.codeclimate.com/v1/badges/04abc6d1562d5f628f8a/maintainability
