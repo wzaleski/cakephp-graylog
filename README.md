@@ -42,7 +42,7 @@ Possible configuration parameters are:
 
 ### Further reading
 
-* About [CakePHP 2.x Logging](https://book.cakephp.org/2/en/core-libraries/logging.html)
+* About [CakePHP 3.x Logging](https://book.cakephp.org/3/en/core-libraries/logging.html)
 * About [Graylog 3.x in general](https://docs.graylog.org/en/3.1/index.html)
 * About [Graylog Extended Log Format (GELF)](https://docs.graylog.org/en/3.1/pages/gelf.html)
 
