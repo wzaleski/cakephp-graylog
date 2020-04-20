@@ -124,15 +124,9 @@ class GraylogLog extends BaseLog
      */
     public function write($type, $message)
     {
-        /**
-         * Do not continue unless this engine is supposed to log this type of
-         * message.
-         */
-        if (in_array($type, $this->_config['types'], true)) {
-            $this->getPublisher()->publish(
-                $this->createMessage($type, $message)
-            );
-        }
+        $this->getPublisher()->publish(
+            $this->createMessage($type, $message)
+        );
     }
 
     /**
