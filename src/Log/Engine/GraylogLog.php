@@ -130,15 +130,9 @@ class GraylogLog extends BaseLog
      */
     public function log($level, $message, array $context = [])
     {
-        /**
-         * Do not continue unless this engine is supposed to log this level of
-         * message.
-         */
-        if (in_array($level, $this->_config['levels'], true)) {
-            $this->getPublisher()->publish(
-                $this->createMessage($level, $message)
-            );
-        }
+        $this->getPublisher()->publish(
+            $this->createMessage($level, $message)
+        );
     }
 
     /**
