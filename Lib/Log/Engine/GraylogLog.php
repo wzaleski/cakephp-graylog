@@ -198,7 +198,7 @@ class GraylogLog extends BaseLog
          * Append backtrace in case it's not already in the message.
          */
         if ($this->_config['append_backtrace'] === true
-            && strpos($message, 'Stack Trace:') === false
+            && strpos($message, 'Trace:') === false
         ) {
             ob_start();
             debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -220,7 +220,7 @@ class GraylogLog extends BaseLog
             /**
              * Append backtrace to message.
              */
-            $message .= PHP_EOL . PHP_EOL . 'Stack Trace:' . PHP_EOL;
+            $message .= PHP_EOL . PHP_EOL . 'Trace:' . PHP_EOL;
             $message .= $trace;
         }
 
