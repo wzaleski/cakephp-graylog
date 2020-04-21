@@ -203,7 +203,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
         ], $message->getAllAdditionals());
         static::assertContains('POST:', $message->getFullMessage());
         static::assertContains('Session:', $message->getFullMessage());
-        static::assertContains('Stack Trace:', $message->getFullMessage());
+        static::assertContains('Trace:', $message->getFullMessage());
     }
 
     /**
