@@ -76,10 +76,7 @@ namespace {
             static::assertSame('error', $publisher->message->getLevel());
             static::assertSame('P5oUZLqcjx', $publisher->message->getShortMessage());
             static::assertNull($publisher->message->getFullMessage());
-            static::assertSame([
-                'http_referer' => null,
-                'request_uri' => null
-            ], $publisher->message->getAllAdditionals());
+            static::assertSame([], $publisher->message->getAllAdditionals());
         }
     }
 }
