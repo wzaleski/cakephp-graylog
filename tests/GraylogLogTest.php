@@ -197,10 +197,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
         static::assertSame('CakePHP', $message->getFacility());
         static::assertSame('debug', $message->getLevel());
         static::assertSame('mnfiXQoolR', $message->getShortMessage());
-        static::assertSame([
-            'http_referer' => null,
-            'request_uri' => null
-        ], $message->getAllAdditionals());
+        static::assertSame([], $message->getAllAdditionals());
         static::assertContains('POST:', $message->getFullMessage());
         static::assertContains('Session:', $message->getFullMessage());
         static::assertContains('Trace:', $message->getFullMessage());
