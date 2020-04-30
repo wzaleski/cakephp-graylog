@@ -190,9 +190,12 @@ class GraylogLog extends BaseLog
         $gelfMessage = (new GelfMessage())
             ->setVersion('1.1')
             ->setLevel($type)
-            ->setFacility($this->_config['facility'])
-            ->setAdditional('http_referer', Hash::get($_SERVER, 'HTTP_REFERER'))
-            ->setAdditional('request_uri', Hash::get($_SERVER, 'REQUEST_URI'));
+            ->setFacility($this->_config['facility']);
+        if (PHP_SAPI !== 'cli') {
+            $gelfMessage
+                ->setAdditional('http_referer', Hash::get($_SERVER, 'HTTP_REFERER'))
+                ->setAdditional('request_uri', Hash::get($_SERVER, 'REQUEST_URI'));
+        }
 
         /**
          * Append backtrace in case it's not already in the message.
