@@ -215,7 +215,7 @@ class GraylogLog extends BaseLog
              */
             $trace = preg_replace_callback(
                 '/^#(\d+)/m',
-                function ($matches) {
+                static function ($matches) {
                     if ($matches[1] >= 10 && $matches[1] < 13) {
                         return '#' . ($matches[1] - 3) . ' ';
                     }
