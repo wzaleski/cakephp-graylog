@@ -9,6 +9,7 @@ use Gelf\Transport\UdpTransport;
 use Psr\Log\LogLevel;
 
 App::uses('BaseLog', 'Log/Engine');
+App::uses('Router', 'Routing');
 
 /**
  * Class GraylogLog
@@ -191,10 +192,12 @@ class GraylogLog extends BaseLog
             ->setVersion('1.1')
             ->setLevel($type)
             ->setFacility($this->_config['facility']);
-        if (PHP_SAPI !== 'cli') {
-            $gelfMessage
-                ->setAdditional('http_referer', Hash::get($_SERVER, 'HTTP_REFERER'))
-                ->setAdditional('request_uri', Hash::get($_SERVER, 'REQUEST_URI'));
+        if (PHP_SAPI !== 'cli' && ($request = Router::getRequest()) !== null) {
+            $referer = $request->referer(true);
+            if (!empty($referer)) {
+                $gelfMessage->setAdditional('http_referer', $referer);
+            }
+            $gelfMessage->setAdditional('request_uri', $request->here());
         }
 
         /**
