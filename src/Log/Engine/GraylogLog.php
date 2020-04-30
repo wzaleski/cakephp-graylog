@@ -3,6 +3,7 @@
 namespace kbATeam\CakePhpGraylog\Log\Engine;
 
 use Cake\Log\Engine\BaseLog;
+use Cake\Routing\Router;
 use Cake\Utility\Hash;
 use Gelf\Message as GelfMessage;
 use Gelf\Publisher;
@@ -197,10 +198,12 @@ class GraylogLog extends BaseLog
             ->setVersion('1.1')
             ->setLevel($level)
             ->setFacility($this->_config['facility']);
-        if (PHP_SAPI !== 'cli') {
-            $gelfMessage
-                ->setAdditional('http_referer', Hash::get($_SERVER, 'HTTP_REFERER'))
-                ->setAdditional('request_uri', Hash::get($_SERVER, 'REQUEST_URI'));
+        if (PHP_SAPI !== 'cli' && ($request = Router::getRequest()) !== null) {
+            $referer = $request->referer(true);
+            if (!empty($referer)) {
+                $gelfMessage->setAdditional('http_referer', $referer);
+            }
+            $gelfMessage->setAdditional('request_uri', $request->getRequestTarget());
         }
 
         /**
