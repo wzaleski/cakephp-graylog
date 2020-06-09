@@ -8,7 +8,8 @@
         "php": "^7.0",
         "ext-json": "*",
         "cakephp/cakephp": "~3.6",
-        "graylog2/gelf-php": "^1.6"
+        "graylog2/gelf-php": "^1.6",
+        "kba-team/php-backtrace": "^1.0"
     },
     "extra": {
         "installer-name": "Graylog"
