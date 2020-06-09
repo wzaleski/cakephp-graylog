@@ -6,6 +6,7 @@ use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\TransportInterface;
 use Gelf\Transport\UdpTransport;
+use kbATeam\PhpBacktrace\ClassicBacktrace;
 use Psr\Log\LogLevel;
 
 App::uses('BaseLog', 'Log/Engine');
@@ -32,6 +33,12 @@ class GraylogLog extends BaseLog
         'append_backtrace' => true,
         'append_session' => true,
         'append_post' => true,
+        /**
+         * Start backtrace 3 steps back, assuming you use CakeLog::error() or
+         * Model::log() and not CakeLog::write() directly.
+         */
+        'trace_level_offset' => 3,
+        'file_root_dir' => null,
         'password_keys' => [
             'password',
             'new_password',
@@ -199,6 +206,19 @@ class GraylogLog extends BaseLog
             }
             $gelfMessage->setAdditional('request_uri', $request->here());
         }
+        /**
+         * Create a debug backtrace.
+         */
+        $trace = new ClassicBacktrace($this->_config['trace_level_offset'], $this->_config['file_root_dir']);
+
+        /**
+         * In case the log didn't happen in memory (like with reflections), add
+         * the filename and line to the message.
+         */
+        if ($trace->lastStep('file') !== null) {
+            $gelfMessage->setFile($trace->lastStep('file'));
+            $gelfMessage->setLine($trace->lastStep('line'));
+        }
 
         /**
          * Append backtrace in case it's not already in the message.
@@ -206,31 +226,11 @@ class GraylogLog extends BaseLog
         if ($this->_config['append_backtrace'] === true
             && strpos($message, 'Trace:') === false
         ) {
-            ob_start();
-            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            $trace = ob_get_clean();
-            /**
-             * Cut away the last three calls (i.e. the first three lines).
-             */
-            $trace = implode(PHP_EOL, array_slice(explode(PHP_EOL, $trace), 3));
-            /**
-             * Renumber trace steps.
-             */
-            $trace = preg_replace_callback(
-                '/^#(\d+)/m',
-                static function ($matches) {
-                    if ($matches[1] >= 10 && $matches[1] < 13) {
-                        return '#' . ($matches[1] - 3) . ' ';
-                    }
-                    return '#' . ($matches[1] - 3);
-                },
-                $trace
-            );
             /**
              * Append backtrace to message.
              */
             $message .= PHP_EOL . PHP_EOL . 'Trace:' . PHP_EOL;
-            $message .= $trace;
+            $message .= $trace->getClassicString();
         }
 
         /**
