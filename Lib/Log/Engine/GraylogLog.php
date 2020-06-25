@@ -204,7 +204,7 @@ class GraylogLog extends BaseLog
             if (!empty($referer)) {
                 $gelfMessage->setAdditional('http_referer', $referer);
             }
-            $gelfMessage->setAdditional('request_uri', $request->here());
+            $gelfMessage->setAdditional('request_uri', $request->url);
         }
         /**
          * Create a debug backtrace.
