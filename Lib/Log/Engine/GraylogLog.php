@@ -95,7 +95,7 @@ class GraylogLog extends BaseLog
          */
         if ($config['append_post'] === true) {
             $passwordKeys = $config['password_keys'];
-            $config['append']['POST'] = static function() use ($passwordKeys) {
+            $config['append']['POST'] = static function () use ($passwordKeys) {
                 if (!empty($_POST)) {
                     return json_encode(
                         (new Obfuscator($passwordKeys))->obfuscate($_POST),
@@ -110,7 +110,7 @@ class GraylogLog extends BaseLog
          */
         if ($config['append_session'] === true) {
             $passwordKeys = $config['password_keys'];
-            $config['append']['Session'] = static function() use ($passwordKeys) {
+            $config['append']['Session'] = static function () use ($passwordKeys) {
                 if (!empty($_SESSION)) {
                     return json_encode(
                         (new Obfuscator($passwordKeys))->obfuscate($_SESSION),

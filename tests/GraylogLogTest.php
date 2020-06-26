@@ -268,7 +268,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
     {
         $log = new PublicGraylogLog([
             'additional' => [
-                'bmC5B27F3R' => static function() {
+                'bmC5B27F3R' => static function () {
                     return 'MSg9BrM4DG';
                 }
             ]
