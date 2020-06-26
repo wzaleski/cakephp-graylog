@@ -47,12 +47,4 @@ class PublicGraylogLog extends GraylogLog
     {
         return parent::createMessage($level, $message);
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function obscurePasswords(array $data)
-    {
-        return parent::obscurePasswords($data);
-    }
 }

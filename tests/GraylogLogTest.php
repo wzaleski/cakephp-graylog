@@ -42,9 +42,9 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
         static::assertSame(UdpTransport::CHUNK_SIZE_LAN, $log->getMyConfig('chunk_size'));
         static::assertNull($log->getMyConfig('ssl_options'));
         static::assertSame('CakePHP', $log->getMyConfig('facility'));
-        static::assertTrue($log->getMyConfig('append_backtrace'));
-        static::assertTrue($log->getMyConfig('append_session'));
-        static::assertTrue($log->getMyConfig('append_post'));
+        static::assertFalse($log->getMyConfig('append_backtrace'));
+        static::assertFalse($log->getMyConfig('append_session'));
+        static::assertFalse($log->getMyConfig('append_post'));
         static::assertSame([
             'password',
             'new_password',
@@ -136,8 +136,8 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      */
     public function testSettingLogLevels()
     {
-        $log = new PublicGraylogLog(['levels' => ['error', 'warning', 'i5A64FtlPt']]);
-        static::assertSame(['error', 'warning'], $log->getMyConfig('levels'));
+        $log = new PublicGraylogLog(['levels' => [LogLevel::ERROR, LogLevel::WARNING, 'i5A64FtlPt']]);
+        static::assertSame([LogLevel::ERROR, LogLevel::WARNING], $log->getMyConfig('levels'));
     }
 
     /**
@@ -181,7 +181,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
     /**
      * Test creating a GELF message with default settings.
      */
-    public function testCreatingMessageWithDefaults()
+    public function testCreatingLongMessage()
     {
         $_POST = [
             'PAYy2EKmuW' => 'E8RUOjsjAn'
@@ -191,11 +191,15 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
                 'Z00UBd2lf9' => 'x6jETf91v8'
             ]
         ];
-        $log = new PublicGraylogLog();
-        $message = $log->createMessage('debug', 'mnfiXQoolR');
+        $log = new PublicGraylogLog([
+            'append_backtrace' => true,
+            'append_session' => true,
+            'append_post' => true
+        ]);
+        $message = $log->createMessage(LogLevel::DEBUG, 'mnfiXQoolR');
         static::assertInstanceOf(GelfMessage::class, $message);
         static::assertSame('CakePHP', $message->getFacility());
-        static::assertSame('debug', $message->getLevel());
+        static::assertSame(LogLevel::DEBUG, $message->getLevel());
         static::assertSame('mnfiXQoolR', $message->getShortMessage());
         static::assertSame([], $message->getAllAdditionals());
         static::assertContains('POST:', $message->getFullMessage());
@@ -208,41 +212,11 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      */
     public function testShortMessage()
     {
-        $log = new PublicGraylogLog([
-            'append_backtrace' => false,
-            'append_session' => false,
-            'append_post' => false
-        ]);
-        $message = $log->createMessage('info', 'oIEUMcF1Ce');
-        static::assertSame('info', $message->getLevel());
+        $log = new PublicGraylogLog();
+        $message = $log->createMessage(LogLevel::ALERT, 'oIEUMcF1Ce');
+        static::assertSame(LogLevel::ALERT, $message->getLevel());
         static::assertSame('oIEUMcF1Ce', $message->getShortMessage());
         static::assertNull($message->getFullMessage());
-    }
-
-    /**
-     * Test obscuring passwords.
-     */
-    public function testObscuringPasswords()
-    {
-        $log = new PublicGraylogLog();
-        $result = $log->obscurePasswords([
-            'new_password' => null,
-            'hQCJnsPUkD' => [
-                'YwbEbRTYK7' => 'lHsnKC4GLN',
-                'password' => 'AQeb4yDHAd',
-                'old_password' => false,
-                'current_password' => ''
-            ]
-        ]);
-        static::assertSame([
-            'new_password' => null,
-            'hQCJnsPUkD' => [
-                'YwbEbRTYK7' => 'lHsnKC4GLN',
-                'password' => '********',
-                'old_password' => false,
-                'current_password' => ''
-            ]
-        ], $result);
     }
 
     /**
@@ -292,5 +266,44 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
          * Assert that we actually get the same instance.
          */
         static::assertSame($publisher, $log->getPublisher());
+    }
+
+    /**
+     * Test adding additional field.
+     */
+    public function testAddingAdditionalFields()
+    {
+        $log = new PublicGraylogLog([
+            'additional' => [
+                'bmC5B27F3R' => static function () {
+                    return 'MSg9BrM4DG';
+                }
+            ]
+        ]);
+        $message = $log->createMessage(LogLevel::INFO, 'Cy6BWVa5E0');
+        static::assertSame(LogLevel::INFO, $message->getLevel());
+        static::assertSame('Cy6BWVa5E0', $message->getShortMessage());
+        static::assertNull($message->getFullMessage());
+        static::assertSame('MSg9BrM4DG', $message->getAdditional('bmC5B27F3R'));
+    }
+
+    /**
+     * Test creating a GELF message with all flags enabled.
+     */
+    public function testNoEmptyPostInLongMessage()
+    {
+        $_SESSION = [
+            'edjjLLLg14' => 'G78eIm8UbE'
+        ];
+        $log = new PublicGraylogLog([
+            'append_post' => true
+        ]);
+        $message = $log->createMessage(LogLevel::CRITICAL, 'oP6MkuApf9');
+        static::assertInstanceOf(GelfMessage::class, $message);
+        static::assertSame('CakePHP', $message->getFacility());
+        static::assertSame(LogLevel::CRITICAL, $message->getLevel());
+        static::assertSame('oP6MkuApf9', $message->getShortMessage());
+        static::assertSame([], $message->getAllAdditionals());
+        static::assertNull($message->getFullMessage());
     }
 }
