@@ -19,12 +19,34 @@ composer require kba-team/cakephp-graylog
 CakePlugin::load('Graylog');
 CakeLog::config('graylog', [
     'engine' => 'Graylog.Graylog',
-    'types' => ['warning', 'error', 'critical', 'alert', 'emergency'],
+    'types' => ['warning', 'error', 'critical', 'alert', 'emergency'], //PSR log levels
     'host' => 'graylog.example.com',
+    'port' => 12201,
     'facility' => 'MyAppName',
-    'append_backtrace' => true,
-    'append_session' => true,
-    'append_post' => true
+    'append_backtrace' => true, //append a complete backtrace to the message body
+    'append' => [
+        //append the contents of $_POST JSON encoded to the message body
+        'POST' => static function () {
+             if (!empty($_POST)) {
+                $obfuscator = new \kbATeam\GraylogUtilities\Obfuscator();
+                //Replace the value of all keys named 'password' with 'xxx'.
+                $obfuscator->addKey('password');
+                $obfuscator->setObfuscationString('xxx');
+                //JSON encode the POST variable for readability.
+                return json_encode(
+                    $obfuscator->obfuscate($_POST),
+                    JSON_PRETTY_PRINT
+                );
+             }
+             return null;
+        }
+    ],
+    'additional' => [
+        //Add field 'current_user' to the GELF message.
+        'current_user' => static function () {
+             return AuthComponent::user('username');
+        }
+    ]
 ]);
 ```
 
@@ -36,10 +58,9 @@ Possible configuration parameters are:
 * `chunk_size` The size of the UDP packages. Default: `\Gelf\Transport\UdpTransport::CHUNK_SIZE_LAN`
 * `ssl_options` An instance of `\Gelf\Transport\SslOptions` defining SSL settings for TCP connections. Default: `null`
 * `facility` The logging facility. Default: `CakePHP`.
-* `append_backtrace` Append a backtrace to the message? Default: `true`
-* `append_session` Append the contents of the session to the message? Passwords will be removed according to the list in `password_keys`. Default: `true`
-* `append_post` Append the POST parameters to the message? Passwords will be removed according to the list in `password_keys`. Default: `true`
-* `password_keys` The values of these keys in the session and post array will be replaced by `********`. Default: `['password', 'new_password', 'old_password', 'current_password']`
+* `append_backtrace` Append a backtrace to the message body? Default: `true`
+* `append` Array of anonymous functions. Their return strings get appended to the message body.
+* `additional` Array of anonymous functions. Their return values get added as additional fields to the GELF message.
 * `types` Array of log types, that will be sent to Graylog. See `\Psr\Log\LogLevel` for all possible values. Default: all of them.
 
 ### Further reading
