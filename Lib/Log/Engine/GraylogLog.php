@@ -6,8 +6,9 @@ use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\TransportInterface;
 use Gelf\Transport\UdpTransport;
+use kbATeam\GraylogUtilities\LogTypes;
+use kbATeam\GraylogUtilities\Obfuscator;
 use kbATeam\PhpBacktrace\ClassicBacktrace;
-use Psr\Log\LogLevel;
 
 App::uses('BaseLog', 'Log/Engine');
 App::uses('Router', 'Routing');
@@ -30,9 +31,11 @@ class GraylogLog extends BaseLog
         'chunk_size' => UdpTransport::CHUNK_SIZE_LAN,
         'ssl_options' => null,
         'facility' => 'CakePHP',
-        'append_backtrace' => true,
-        'append_session' => true,
-        'append_post' => true,
+        'append_backtrace' => false,
+        'append_session' => false,
+        'append_post' => false,
+        'append' => [],
+        'additional' => [],
         /**
          * Start backtrace 3 steps back, assuming you use CakeLog::error() or
          * Model::log() and not CakeLog::write() directly.
@@ -46,20 +49,6 @@ class GraylogLog extends BaseLog
             'current_password'
         ],
         'types' => []
-    ];
-
-    /**
-     * @var array Array of allowed log level types.
-     */
-    protected static $allowedTypes = [
-        LogLevel::EMERGENCY,
-        LogLevel::ALERT,
-        LogLevel::CRITICAL,
-        LogLevel::ERROR,
-        LogLevel::WARNING,
-        LogLevel::NOTICE,
-        LogLevel::INFO,
-        LogLevel::DEBUG
     ];
 
     /**
@@ -98,25 +87,42 @@ class GraylogLog extends BaseLog
          */
         $config['scheme'] = strtolower($config['scheme']);
         /**
-         * Ensure that the types array actually is an array.
+         * Set log types.
          */
-        if (!is_array($config['types'])) {
-            $config['types'] = [];
+        $config['types'] = (new LogTypes($config['types']))->get();
+        /**
+         * Translate former append POST flag to new function.
+         */
+        if ($config['append_post'] === true) {
+            $passwordKeys = $config['password_keys'];
+            $config['append']['POST'] = static function() use ($passwordKeys) {
+                if (!empty($_POST)) {
+                    return json_encode(
+                        (new Obfuscator($passwordKeys))->obfuscate($_POST),
+                        JSON_PRETTY_PRINT
+                    );
+                }
+                return null;
+            };
         }
         /**
-         * Remove all types that are not PSR-3.
+         * Translate former append session flag to new function.
          */
-        foreach ($config['types'] as $key => $type) {
-            if (!in_array($type, static::$allowedTypes, true)) {
-                unset($config['types'][$key]);
-            }
+        if ($config['append_session'] === true) {
+            $passwordKeys = $config['password_keys'];
+            $config['append']['Session'] = static function() use ($passwordKeys) {
+                if (!empty($_SESSION)) {
+                    return json_encode(
+                        (new Obfuscator($passwordKeys))->obfuscate($_SESSION),
+                        JSON_PRETTY_PRINT
+                    );
+                }
+                return null;
+            };
         }
         /**
-         * Enable all types in case types are empty.
+         * Configure parent class.
          */
-        if ($config['types'] === []) {
-            $config['types'] = static::$allowedTypes;
-        }
         parent::__construct($config);
     }
 
@@ -221,6 +227,19 @@ class GraylogLog extends BaseLog
         }
 
         /**
+         * Append function output to the message.
+         */
+        foreach ($this->_config['append'] as $key => $function) {
+            if (is_callable($function)) {
+                $appendString = $function();
+                if (!empty($appendString)) {
+                    $message .= PHP_EOL . PHP_EOL . $key . ':' . PHP_EOL;
+                    $message .= $appendString;
+                }
+            }
+        }
+
+        /**
          * Append backtrace in case it's not already in the message.
          */
         if ($this->_config['append_backtrace'] === true
@@ -234,28 +253,12 @@ class GraylogLog extends BaseLog
         }
 
         /**
-         * Append POST variables to message.
+         * Set function output as additional field.
          */
-        if ($this->_config['append_post'] === true && !empty($_POST)) {
-            $message .= PHP_EOL . PHP_EOL . 'POST:' . PHP_EOL;
-            $message .= json_encode(
-                $this->obscurePasswords($_POST),
-                JSON_PRETTY_PRINT
-            );
-        }
-
-        /**
-         * Append session variables to message.
-         */
-        if ($this->_config['append_session'] === true
-            && isset($_SESSION)
-            && !empty($_SESSION)
-        ) {
-            $message .= PHP_EOL . PHP_EOL . 'Session:' . PHP_EOL;
-            $message .= json_encode(
-                $this->obscurePasswords($_SESSION),
-                JSON_PRETTY_PRINT
-            );
+        foreach ($this->_config['additional'] as $key => $function) {
+            if (is_callable($function)) {
+                $gelfMessage->setAdditional($key, (string)$function());
+            }
         }
 
         /**
@@ -273,27 +276,5 @@ class GraylogLog extends BaseLog
         return $gelfMessage
             ->setShortMessage($shortMessage)
             ->setFullMessage($message);
-    }
-
-    /**
-     * Replace password(s) in data array.
-     * @param array $data
-     * @return array
-     */
-    protected function obscurePasswords(array $data)
-    {
-        array_walk_recursive(
-            $data,
-            function (&$contents, $key) {
-                if (isset($contents)
-                    && is_string($contents)
-                    && in_array(strtolower($key), $this->_config['password_keys'], true)
-                    && trim($contents) !== ''
-                ) {
-                    $contents = '********';
-                }
-            }
-        );
-        return $data;
     }
 }

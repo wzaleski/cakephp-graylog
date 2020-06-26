@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f14e02309392de45c8eca9de2ef20974",
+    "content-hash": "fd5abbc29f579054a262f76009939575",
     "packages": [
         {
             "name": "cakephp/cakephp",
@@ -232,6 +232,40 @@
             ],
             "description": "A php implementation to send log-messages to a GELF compatible backend like Graylog2.",
             "time": "2020-04-24T05:38:21+00:00"
+        },
+        {
+            "name": "kba-team/graylog-utilities",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/the-kbA-team/GraylogUtilities.git",
+                "reference": "342fc7be4166d3b3132b424a9b7f12ff32c73de8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/the-kbA-team/GraylogUtilities/zipball/342fc7be4166d3b3132b424a9b7f12ff32c73de8",
+                "reference": "342fc7be4166d3b3132b424a9b7f12ff32c73de8",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5|^7.0",
+                "psr/log": "^1.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "kbATeam\\GraylogUtilities\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Utilities for logging",
+            "time": "2020-06-25T16:33:14+00:00"
         },
         {
             "name": "kba-team/php-backtrace",
