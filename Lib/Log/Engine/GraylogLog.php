@@ -22,6 +22,12 @@ App::uses('Router', 'Routing');
 class GraylogLog extends BaseLog
 {
     /**
+     * Loop detection.
+     * @var bool
+     */
+    private $loop = false;
+
+    /**
      * @var array Configuration array containing sane defaults.
      */
     protected $_config = [
@@ -138,9 +144,14 @@ class GraylogLog extends BaseLog
      */
     public function write($type, $message)
     {
+        if ($this->loop === true) {
+            return;
+        }
+        $this->loop = true;
         $this->getPublisher()->publish(
             $this->createMessage($type, $message)
         );
+        $this->loop = false;
     }
 
     /**
