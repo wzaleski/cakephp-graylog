@@ -157,6 +157,7 @@ class GraylogLog extends BaseLog
     /**
      * @return Publisher
      * @throws \LogicException
+     * @throws \InvalidArgumentException
      */
     protected function getPublisher()
     {
@@ -169,6 +170,7 @@ class GraylogLog extends BaseLog
     /**
      * @return TransportInterface
      * @throws \LogicException
+     * @throws \InvalidArgumentException
      */
     protected function getTransport()
     {
@@ -181,7 +183,8 @@ class GraylogLog extends BaseLog
     /**
      * Initialize the transport class for sending greylog messages.
      * @return TransportInterface
-     * @throws LogicException
+     * @throws \LogicException Connection scheme configuration error.
+     * @throws \InvalidArgumentException UdpTransport or TcpTransport config errors.
      */
     private function initTransport()
     {
@@ -207,7 +210,6 @@ class GraylogLog extends BaseLog
      * @param string $type    Message type.
      * @param string $message Message to write.
      * @return GelfMessage
-     * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
     protected function createMessage($type, $message)
@@ -226,7 +228,10 @@ class GraylogLog extends BaseLog
         /**
          * Create a debug backtrace.
          */
-        $trace = new ClassicBacktrace($this->_config['trace_level_offset'], $this->_config['file_root_dir']);
+        $trace = new ClassicBacktrace(
+            $this->_config['trace_level_offset'],
+            $this->_config['file_root_dir']
+        );
 
         /**
          * In case the log didn't happen in memory (like with reflections), add
