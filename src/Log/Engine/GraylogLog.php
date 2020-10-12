@@ -25,6 +25,12 @@ use kbATeam\GraylogUtilities\Obfuscator;
 class GraylogLog extends BaseLog
 {
     /**
+     * Loop detection
+     * @var bool
+     */
+    private $loop = false;
+
+    /**
      * @var array Configuration array containing sane defaults.
      */
     protected $_config = [
@@ -141,9 +147,14 @@ class GraylogLog extends BaseLog
      */
     public function log($level, $message, array $context = [])
     {
+        if ($this->loop === true) {
+            return;
+        }
+        $this->loop = true;
         $this->getPublisher()->publish(
             $this->createMessage($level, $message)
         );
+        $this->loop = false;
     }
 
     /**
