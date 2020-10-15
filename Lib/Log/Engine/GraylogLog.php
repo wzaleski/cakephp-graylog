@@ -37,6 +37,7 @@ class GraylogLog extends BaseLog
         'chunk_size' => UdpTransport::CHUNK_SIZE_LAN,
         'ssl_options' => null,
         'facility' => 'CakePHP',
+        'add_file_and_line' => true,
         'append_backtrace' => false,
         'append_session' => false,
         'append_post' => false,
@@ -225,19 +226,27 @@ class GraylogLog extends BaseLog
             }
             $gelfMessage->setAdditional('request_uri', $request->url);
         }
+        $add_file_and_line = $this->_config['add_file_and_line'] === true;
+        /**
+         * Append backtrace in case it's not already in the message.
+         */
+        $append_backtrace = $this->_config['append_backtrace'] === true
+                            && strpos($message, 'Trace:') === false;
         /**
          * Create a debug backtrace.
          */
-        $trace = new ClassicBacktrace(
-            $this->_config['trace_level_offset'],
-            $this->_config['file_root_dir']
-        );
+        if ($add_file_and_line || $append_backtrace) {
+            $trace = new ClassicBacktrace(
+                $this->_config['trace_level_offset'],
+                $this->_config['file_root_dir']
+            );
+        }
 
         /**
          * In case the log didn't happen in memory (like with reflections), add
          * the filename and line to the message.
          */
-        if ($trace->lastStep('file') !== null) {
+        if ($add_file_and_line && $trace->lastStep('file') !== null) {
             $gelfMessage->setFile($trace->lastStep('file'));
             $gelfMessage->setLine($trace->lastStep('line'));
         }
@@ -258,9 +267,7 @@ class GraylogLog extends BaseLog
         /**
          * Append backtrace in case it's not already in the message.
          */
-        if ($this->_config['append_backtrace'] === true
-            && strpos($message, 'Trace:') === false
-        ) {
+        if ($append_backtrace) {
             /**
              * Append backtrace to message.
              */
