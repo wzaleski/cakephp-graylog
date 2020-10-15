@@ -40,6 +40,7 @@ class GraylogLog extends BaseLog
         'chunk_size' => UdpTransport::CHUNK_SIZE_LAN,
         'ssl_options' => null,
         'facility' => 'CakePHP',
+        'add_file_and_line' => true,
         'append_backtrace' => false,
         'append_session' => false,
         'append_post' => false,
@@ -191,18 +192,18 @@ class GraylogLog extends BaseLog
      */
     private function initTransport()
     {
-        if ($this->_config['scheme'] === 'udp') {
+        if ($this->getConfig('scheme', 'udp') === 'udp') {
             return new UdpTransport(
-                $this->_config['host'],
-                $this->_config['port'],
-                $this->_config['chunk_size']
+                $this->getConfig('host'),
+                $this->getConfig('port'),
+                $this->getConfig('chunk_size')
             );
         }
-        if ($this->_config['scheme'] === 'tcp') {
+        if ($this->getConfig('scheme') === 'tcp') {
             return new TcpTransport(
-                $this->_config['host'],
-                $this->_config['port'],
-                $this->_config['ssl_options']
+                $this->getConfig('host'),
+                $this->getConfig('port'),
+                $this->getConfig('ssl_options')
             );
         }
         throw new LogicException('Unkown transport scheme for GreyLog!');
@@ -220,7 +221,7 @@ class GraylogLog extends BaseLog
         $gelfMessage = (new GelfMessage())
             ->setVersion('1.1')
             ->setLevel($level)
-            ->setFacility($this->_config['facility']);
+            ->setFacility($this->getConfig('facility', 'CakePHP'));
         if (PHP_SAPI !== 'cli' && ($request = Router::getRequest()) !== null) {
             $referer = $request->referer(true);
             if (!empty($referer)) {
@@ -228,19 +229,27 @@ class GraylogLog extends BaseLog
             }
             $gelfMessage->setAdditional('request_uri', $request->getRequestTarget());
         }
+        $add_file_and_line = $this->getConfig('add_file_and_line', true) === true;
+        /**
+         * Append backtrace in case it's not already in the message.
+         */
+        $append_backtrace = $this->getConfig('append_backtrace', false) === true
+                            && strpos($message, 'Trace:') === false;
         /**
          * Create a debug backtrace.
          */
-        $trace = new ClassicBacktrace(
-            $this->getConfig('trace_level_offset'),
-            $this->getConfig('file_root_dir')
-        );
+        if ($add_file_and_line || $append_backtrace) {
+            $trace = new ClassicBacktrace(
+                $this->getConfig('trace_level_offset'),
+                $this->getConfig('file_root_dir')
+            );
+        }
 
         /**
          * In case the log didn't happen in memory (like with reflections), add
          * the filename and line to the message.
          */
-        if ($trace->lastStep('file') !== null) {
+        if ($add_file_and_line && $trace->lastStep('file') !== null) {
             $gelfMessage->setFile($trace->lastStep('file'));
             $gelfMessage->setFile($trace->lastStep('line'));
         }
@@ -248,7 +257,7 @@ class GraylogLog extends BaseLog
         /**
          * Append function output to the message.
          */
-        foreach ($this->_config['append'] as $key => $function) {
+        foreach ($this->getConfig('append', []) as $key => $function) {
             if (is_callable($function)) {
                 $appendString = $function();
                 if (!empty($appendString)) {
@@ -261,9 +270,7 @@ class GraylogLog extends BaseLog
         /**
          * Append backtrace in case it's not already in the message.
          */
-        if ($this->_config['append_backtrace'] === true
-            && strpos($message, 'Trace:') === false
-        ) {
+        if ($append_backtrace) {
             /**
              * Append backtrace to message.
              */
@@ -274,7 +281,7 @@ class GraylogLog extends BaseLog
         /**
          * Set function output as additional field.
          */
-        foreach ($this->_config['additional'] as $key => $function) {
+        foreach ($this->getConfig('additional', []) as $key => $function) {
             if (is_callable($function)) {
                 $gelfMessage->setAdditional($key, (string)$function());
             }
