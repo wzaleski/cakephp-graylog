@@ -55,6 +55,7 @@ Possible configuration parameters are:
 * `host` The hostname of the Graylog server. Default: `127.0.0.1`
 * `port` The port, the Graylog server listens to. Default: `12201`
 * `url` A connection URL in format `<scheme>://<host>:<port>`. This will overwrite any other settings.
+* `ignore_transport_errors` Ignore transport errors Default: `true`
 * `chunk_size` The size of the UDP packages. Default: `\Gelf\Transport\UdpTransport::CHUNK_SIZE_LAN`
 * `ssl_options` An instance of `\Gelf\Transport\SslOptions` defining SSL settings for TCP connections. Default: `null`
 * `facility` The logging facility. Default: `CakePHP`.

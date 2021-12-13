@@ -7,6 +7,7 @@ use Cake\Routing\Router;
 use Cake\Utility\Hash;
 use Gelf\Message as GelfMessage;
 use Gelf\Publisher;
+use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\TransportInterface;
@@ -37,6 +38,7 @@ class GraylogLog extends BaseLog
         'scheme' => 'udp',
         'host' => '127.0.0.1',
         'port' => 12201,
+        'ignore_transport_errors' => true,
         'chunk_size' => UdpTransport::CHUNK_SIZE_LAN,
         'ssl_options' => null,
         'facility' => 'CakePHP',
@@ -185,12 +187,28 @@ class GraylogLog extends BaseLog
     }
 
     /**
+     * Initialize the transport and wrap it into a class ignoring transport
+     * errors depending on the configuration.
+     *
+     * @return TransportInterface
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     */
+    private function initTransport()
+    {
+        if ($this->getConfig('ignore_transport_errors') === false) {
+            return $this->buildTransport();
+        }
+        return new IgnoreErrorTransportWrapper($this->buildTransport());
+    }
+
+    /**
      * Initialize the transport class for sending greylog messages.
      * @return TransportInterface
      * @throws \LogicException
      * @throws \InvalidArgumentException
      */
-    private function initTransport()
+    private function buildTransport()
     {
         if ($this->getConfig('scheme', 'udp') === 'udp') {
             return new UdpTransport(
