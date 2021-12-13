@@ -8,10 +8,15 @@ use Gelf\Publisher;
 use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\UdpTransport;
+use InvalidArgumentException;
 use kbATeam\CakePhpGraylog\Log\Engine\GraylogLog;
+use LogicException;
+use PHPUnit_Framework_AssertionFailedError;
+use PHPUnit_Framework_Exception;
 use PHPUnit_Framework_TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use RuntimeException;
 use stdClass;
 
 /**
@@ -21,6 +26,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 {
     /**
      * Test inheritance chain to ensure this test deals with the correct class.
+     * @throws PHPUnit_Framework_Exception
      */
     public function testInheritance()
     {
@@ -32,6 +38,8 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test default config settings to ensure that later settings are different.
+     * @throws PHPUnit_Framework_AssertionFailedError
+     * @throws InvalidArgumentException
      */
     public function testDefaultConfig()
     {
@@ -65,6 +73,8 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test that valid ssl options are being added to the configuration.
+     * @throws PHPUnit_Framework_Exception
+     * @throws InvalidArgumentException
      */
     public function testValidSslOptions()
     {
@@ -76,7 +86,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      * Provide invalid values for ssl options.
      * @return array
      */
-    public static function provideInvalidSslOptions()
+    public static function provideInvalidSslOptions(): array
     {
         return [
             ['3UmVE8Hx8X'],
@@ -94,6 +104,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      * Test that invalid ssl options will always result in null.
      * @param mixed $option
      * @dataProvider provideInvalidSslOptions
+     * @throws InvalidArgumentException
      */
     public function testInvalidSslOptions($option)
     {
@@ -105,7 +116,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      * Data provider for connection URLs and their parsed values.
      * @return array
      */
-    public static function provideConnectionUrl()
+    public static function provideConnectionUrl(): array
     {
         return [
             ['tcp://1.2.3.4:5678', 'tcp', '1.2.3.4', 5678],
@@ -122,8 +133,11 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      * @param string $host
      * @param int $port
      * @dataProvider provideConnectionUrl
+     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function testConnectionUrl($url, $scheme, $host, $port)
+    public function testConnectionUrl(string $url, string $scheme, string $host, int $port)
     {
         $log = new PublicGraylogLog(['url' => $url]);
         static::assertSame($scheme, $log->getMyConfig('scheme'));
@@ -133,6 +147,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test setting only certain log levels.
+     * @throws InvalidArgumentException
      */
     public function testSettingLogLevels()
     {
@@ -144,7 +159,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      * Data provider of invalid log levels.
      * @return array
      */
-    public static function provideInvalidLogLevels()
+    public static function provideInvalidLogLevels(): array
     {
         return [
             [['vUBTx40Vjr', 'WLWCTyCihX', 152, 4.256, true, false, null, ['debug'], new stdClass()]],
@@ -162,6 +177,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      * Test setting only invalid log levels resulting in enabling all log levels.
      * @param mixed $levels
      * @dataProvider provideInvalidLogLevels
+     * @throws InvalidArgumentException
      */
     public function testInvalidLogLevels($levels)
     {
@@ -180,12 +196,19 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test creating a GELF message with default settings.
+     * @throws RuntimeException
+     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Framework_Exception
      */
     public function testCreatingLongMessage()
     {
+        /** @noinspection PhpArrayWriteIsNotUsedInspection */
         $_POST = [
             'PAYy2EKmuW' => 'E8RUOjsjAn'
         ];
+        /** @noinspection PhpArrayWriteIsNotUsedInspection */
         $_SESSION = [
             'FDSa5d3EAq' => [
                 'Z00UBd2lf9' => 'x6jETf91v8'
@@ -209,6 +232,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test creating a GELF message without any appended debug information.
+     * @throws RuntimeException
      */
     public function testShortMessage()
     {
@@ -221,6 +245,9 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test getting a UDP transport class from default configuration.
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws PHPUnit_Framework_Exception
      */
     public function testUdpTransport()
     {
@@ -235,6 +262,9 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test getting a TCP transport class from default configuration.
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws PHPUnit_Framework_Exception
      */
     public function testTcpTransport()
     {
@@ -245,17 +275,23 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test getting an exception from an invalid scheme.
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unkown transport scheme for GreyLog!
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws PHPUnit_Framework_Exception
      */
     public function testInvalidScheme()
     {
         $log = new PublicGraylogLog(['scheme' => 'http']);
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Unkown transport scheme for GreyLog!');
         $log->getTransport();
     }
 
     /**
      * Test getting a publisher class from default configuration.
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws PHPUnit_Framework_Exception
      */
     public function testPublisher()
     {
@@ -270,6 +306,8 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test adding additional field.
+     * @throws RuntimeException
+     * @throws RuntimeException
      */
     public function testAddingAdditionalFields()
     {
@@ -289,9 +327,12 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test creating a GELF message with all flags enabled.
+     * @throws RuntimeException
+     * @throws PHPUnit_Framework_Exception
      */
     public function testNoEmptyPostInLongMessage()
     {
+        /** @noinspection PhpArrayWriteIsNotUsedInspection */
         $_SESSION = [
             'edjjLLLg14' => 'G78eIm8UbE'
         ];

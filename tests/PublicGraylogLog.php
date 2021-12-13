@@ -2,6 +2,10 @@
 
 namespace Tests\kbATeam\CakePhpGraylog;
 
+use Gelf\Message;
+use Gelf\Publisher;
+use Gelf\Transport\TransportInterface;
+use InvalidArgumentException;
 use kbATeam\CakePhpGraylog\Log\Engine\GraylogLog;
 use Cake\Utility\Hash;
 
@@ -13,10 +17,11 @@ class PublicGraylogLog extends GraylogLog
 {
     /**
      * Get log engine config key or the whole config array in case key is null.
-     * @param string $key
+     * @param string|null $key
      * @return array|mixed
+     * @throws InvalidArgumentException
      */
-    public function getMyConfig($key = null)
+    public function getMyConfig(string $key = null)
     {
         if ($key === null) {
             return $this->_config;
@@ -26,24 +31,27 @@ class PublicGraylogLog extends GraylogLog
 
     /**
      * @inheritDoc
+     * @noinspection PhpOverridingMethodVisibilityInspection
      */
-    public function getPublisher()
+    public function getPublisher(): Publisher
     {
         return parent::getPublisher();
     }
 
     /**
      * @inheritDoc
+     * @noinspection PhpOverridingMethodVisibilityInspection
      */
-    public function getTransport()
+    public function getTransport(): TransportInterface
     {
         return parent::getTransport();
     }
 
     /**
      * @inheritDoc
+     * @noinspection PhpOverridingMethodVisibilityInspection
      */
-    public function createMessage($level, $message)
+    public function createMessage(string $level, string $message): Message
     {
         return parent::createMessage($level, $message);
     }

@@ -1,41 +1,44 @@
 <?php
 
 /**
- * In order to perform a write test, we simply overwrite the class \Gelf\Publisher
- * with a fake one, that will not actually publish anyting.
+ * In order to perform a write-test, we simply overwrite the class \Gelf\Publisher
+ * with a fake one, that will not actually publish anything.
  * Yes it's dirty. Yes it's probably a bug in PHP. But it's so handy ... ^^
  * @noinspection PhpIllegalPsrClassPathInspection
- * @noinspection PhpMultipleClassesDeclarationsInOneFile
  */
 namespace Gelf {
+
+    use Gelf\Transport\TransportInterface;
+
     /**
      * Fake class Publisher
      */
     class Publisher
     {
         /**
-         * @var \Gelf\Transport\TransportInterface
+         * @var TransportInterface
          */
         public $transport;
 
         /**
-         * @var \Gelf\MessageInterface
+         * @var MessageInterface
          */
         public $message;
 
         /**
          * FakePublisher constructor.
-         * @param \Gelf\Transport\TransportInterface|null $transport
+         * @param TransportInterface|null $transport
          */
-        public function __construct($transport = null)
+        public function __construct(TransportInterface $transport = null)
         {
             $this->transport = $transport;
         }
 
         /**
-         * @param \Gelf\MessageInterface $message
+         * @param MessageInterface $message
+         * @noinspection PhpUnused
          */
-        public function publish($message)
+        public function publish(MessageInterface $message)
         {
             $this->message = $message;
         }
@@ -46,7 +49,11 @@ namespace Tests\kbATeam\CakePhpGraylog {
 
     use Gelf\Message as GelfMessage;
     use Gelf\Transport\UdpTransport;
+    use InvalidArgumentException;
+    use LogicException;
+    use PHPUnit_Framework_Exception;
     use PHPUnit_Framework_TestCase;
+    use RuntimeException;
 
     /**
      * Class GraylogWriteTest
@@ -55,6 +62,10 @@ namespace Tests\kbATeam\CakePhpGraylog {
     {
         /**
          * Test writing a message using a fake publisher class.
+         * @throws PHPUnit_Framework_Exception
+         * @throws InvalidArgumentException
+         * @throws LogicException
+         * @throws RuntimeException
          */
         public function testWriteUsingFakePublisher()
         {

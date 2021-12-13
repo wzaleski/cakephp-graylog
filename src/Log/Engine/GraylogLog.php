@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpPropertyNamingConventionInspection */
 
 namespace kbATeam\CakePhpGraylog\Log\Engine;
 
@@ -7,15 +7,18 @@ use Cake\Routing\Router;
 use Cake\Utility\Hash;
 use Gelf\Message as GelfMessage;
 use Gelf\Publisher;
+use Gelf\Transport\AbstractTransport;
 use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\TransportInterface;
 use Gelf\Transport\UdpTransport;
+use InvalidArgumentException;
 use kbATeam\PhpBacktrace\ClassicBacktrace;
 use LogicException;
 use kbATeam\GraylogUtilities\LogTypes;
 use kbATeam\GraylogUtilities\Obfuscator;
+use RuntimeException;
 
 /**
  * Class GraylogLog
@@ -88,7 +91,7 @@ class GraylogLog extends BaseLog
             $config['ssl_options'] = null;
         }
         /**
-         * In case an URL has been defined, parse that url and merge the result
+         * In case a URL has been defined, parse that url and merge the result
          * with existing config.
          */
         if (array_key_exists('url', $config)) {
@@ -140,15 +143,15 @@ class GraylogLog extends BaseLog
      *
      * @param mixed   $level
      * @param string  $message
-     * @param mixed[] $context
+     * @param array $context
      *
      * @return void
      *
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws RuntimeException
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         if ($this->loop === true) {
             return;
@@ -162,10 +165,10 @@ class GraylogLog extends BaseLog
 
     /**
      * @return Publisher
-     * @throws \LogicException
-     * @throws \InvalidArgumentException
+     * @throws LogicException
+     * @throws InvalidArgumentException
      */
-    protected function getPublisher()
+    protected function getPublisher(): Publisher
     {
         if ($this->publisher === null) {
             $this->publisher = new Publisher($this->getTransport());
@@ -175,10 +178,10 @@ class GraylogLog extends BaseLog
 
     /**
      * @return TransportInterface
-     * @throws \LogicException
-     * @throws \InvalidArgumentException
+     * @throws LogicException
+     * @throws InvalidArgumentException
      */
-    protected function getTransport()
+    protected function getTransport(): TransportInterface
     {
         if ($this->transport === null) {
             $this->transport = $this->initTransport();
@@ -194,7 +197,7 @@ class GraylogLog extends BaseLog
      * @throws InvalidArgumentException
      * @throws LogicException
      */
-    private function initTransport()
+    private function initTransport(): TransportInterface
     {
         if ($this->getConfig('ignore_transport_errors') === false) {
             return $this->buildTransport();
@@ -203,12 +206,12 @@ class GraylogLog extends BaseLog
     }
 
     /**
-     * Initialize the transport class for sending greylog messages.
-     * @return TransportInterface
-     * @throws \LogicException
-     * @throws \InvalidArgumentException
+     * Initialize the transport class for sending graylog messages.
+     * @return AbstractTransport
+     * @throws LogicException
+     * @throws InvalidArgumentException
      */
-    private function buildTransport()
+    private function buildTransport(): AbstractTransport
     {
         if ($this->getConfig('scheme', 'udp') === 'udp') {
             return new UdpTransport(
@@ -232,9 +235,9 @@ class GraylogLog extends BaseLog
      * @param string $level   Message level.
      * @param string $message Message to write.
      * @return GelfMessage
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
-    protected function createMessage($level, $message)
+    protected function createMessage(string $level, string $message): GelfMessage
     {
         $gelfMessage = (new GelfMessage())
             ->setVersion('1.1')
