@@ -5,6 +5,7 @@ namespace Tests\kbATeam\CakePhpGraylog;
 use Cake\Log\Engine\BaseLog;
 use Gelf\Message as GelfMessage;
 use Gelf\Publisher;
+use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\UdpTransport;
@@ -251,7 +252,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      */
     public function testUdpTransport()
     {
-        $log = new PublicGraylogLog();
+        $log = new PublicGraylogLog(['ignore_transport_errors' => false]);
         $transport = $log->getTransport();
         static::assertInstanceOf(UdpTransport::class, $transport);
         /**
@@ -268,9 +269,23 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      */
     public function testTcpTransport()
     {
-        $log = new PublicGraylogLog(['scheme' => 'tcp']);
+        $log = new PublicGraylogLog(['scheme' => 'tcp', 'ignore_transport_errors' => false]);
         $transport = $log->getTransport();
         static::assertInstanceOf(TcpTransport::class, $transport);
+    }
+
+    /**
+     * Test getting a transport wrapper class for ignoring errors by default.
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws PHPUnit_Framework_Exception
+     */
+    public function testTransportWrapper()
+    {
+        $log = new PublicGraylogLog();
+        $transport = $log->getTransport();
+        static::assertInstanceOf(IgnoreErrorTransportWrapper::class, $transport);
     }
 
     /**

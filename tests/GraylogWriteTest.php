@@ -72,7 +72,8 @@ namespace Tests\kbATeam\CakePhpGraylog {
             $log = new PublicGraylogLog([
                 'append_backtrace' => false,
                 'append_session' => false,
-                'append_post' => false
+                'append_post' => false,
+                'ignore_transport_errors' => false
             ]);
             //This is the fake publisher, not the real one.
             $publisher = $log->getPublisher();
