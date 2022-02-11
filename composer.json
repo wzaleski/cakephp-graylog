@@ -7,7 +7,7 @@
     "require": {
         "php": "^7.2",
         "ext-json": "*",
-        "cakephp/cakephp": "~3.6",
+        "cakephp/cakephp": "~4.0",
         "graylog2/gelf-php": "^1.6",
         "kba-team/php-backtrace": "^1.0",
         "kba-team/graylog-utilities": "^1.0"
