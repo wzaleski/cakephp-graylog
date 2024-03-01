@@ -1,0 +1,25 @@
+<?php
+
+#App::uses('CakeLogInterface', 'Log');
+
+
+interface CakeLogInterface {
+
+}
+
+
+abstract class BaseLog implements CakeLogInterface
+{
+    /**
+     * @var array<mixed>
+     */
+    protected $_config = array();
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    public function __construct($config = [])
+    {
+
+    }
+}

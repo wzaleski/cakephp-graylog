@@ -34,7 +34,9 @@ namespace Gelf {
 
         /**
          * @param \Gelf\MessageInterface $message
+         * @return void
          */
+
         public function publish($message)
         {
             $this->message = $message;
@@ -54,6 +56,7 @@ namespace {
     {
         /**
          * Test writing a message using a fake publisher class.
+         * @return void
          */
         public function testWriteUsingFakePublisher()
         {

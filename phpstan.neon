@@ -1,0 +1,16 @@
+parameters:
+  level: 9
+  ignoreErrors:
+    - message: '{Parameter #\d+ \$.+ of class .+ constructor expects .+,.+ given.}'
+      path: Lib/Log/Engine/GraylogLog.php
+    - message: '{Argument of an invalid type mixed supplied for foreach, only iterables are supported.}'
+      path: Lib/Log/Engine/GraylogLog.php
+    - message: '{Property Gelf\\Publisher::\$transport \(Gelf\\Transport\\TransportInterface\) does not accept Gelf\\Transport\\TransportInterface\|null.}'
+      path: tests/GraylogWriteTest.php
+  stubFiles:
+    - stubs/BaseLog.stub
+  scanDirectories:
+    - vendor
+  paths:
+    - Lib/
+    - tests/

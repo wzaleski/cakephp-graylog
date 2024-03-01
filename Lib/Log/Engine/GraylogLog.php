@@ -6,6 +6,7 @@ use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\TransportInterface;
+use Gelf\Transport\AbstractTransport;
 use Gelf\Transport\UdpTransport;
 use kbATeam\GraylogUtilities\LogTypes;
 use kbATeam\GraylogUtilities\Obfuscator;
@@ -29,7 +30,7 @@ class GraylogLog extends BaseLog
     private $loop = false;
 
     /**
-     * @var array Configuration array containing sane defaults.
+     * @var array<mixed> Configuration array containing sane defaults.
      */
     protected $_config = [
         'scheme' => 'udp',
@@ -201,7 +202,7 @@ class GraylogLog extends BaseLog
 
     /**
      * Initialize the transport class for sending greylog messages.
-     * @return TransportInterface
+     * @return AbstractTransport
      * @throws \LogicException Connection scheme configuration error.
      * @throws \InvalidArgumentException UdpTransport or TcpTransport config errors.
      */
@@ -253,6 +254,7 @@ class GraylogLog extends BaseLog
         /**
          * Create a debug backtrace.
          */
+        $trace = null;
         if ($add_file_and_line || $append_backtrace) {
             $trace = new ClassicBacktrace(
                 $this->_config['trace_level_offset'],
@@ -264,7 +266,7 @@ class GraylogLog extends BaseLog
          * In case the log didn't happen in memory (like with reflections), add
          * the filename and line to the message.
          */
-        if ($add_file_and_line && $trace->lastStep('file') !== null) {
+        if ($add_file_and_line && (null !== $trace) && ($trace->lastStep('file') !== null)) {
             $gelfMessage->setFile($trace->lastStep('file'));
             $gelfMessage->setLine($trace->lastStep('line'));
         }
@@ -285,7 +287,7 @@ class GraylogLog extends BaseLog
         /**
          * Append backtrace in case it's not already in the message.
          */
-        if ($append_backtrace) {
+        if ($append_backtrace && (null !== $trace)) {
             /**
              * Append backtrace to message.
              */

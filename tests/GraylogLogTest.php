@@ -15,6 +15,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 {
     /**
      * Test inheritance chain to ensure this test deals with the correct class.
+     * @return void
      */
     public function testInheritance()
     {
@@ -26,6 +27,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test default config settings to ensure that later settings are different.
+     * @return void
      */
     public function testDefaultConfig()
     {
@@ -36,9 +38,9 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
         static::assertSame(UdpTransport::CHUNK_SIZE_LAN, $log->getConfig('chunk_size'));
         static::assertNull($log->getConfig('ssl_options'));
         static::assertSame('CakePHP', $log->getConfig('facility'));
-        static::assertFalse($log->getConfig('append_backtrace'));
-        static::assertFalse($log->getConfig('append_session'));
-        static::assertFalse($log->getConfig('append_post'));
+        static::assertFalse((bool)$log->getConfig('append_backtrace'));
+        static::assertFalse((bool)$log->getConfig('append_session'));
+        static::assertFalse((bool)$log->getConfig('append_post'));
         static::assertSame([
             'password',
             'new_password',
@@ -59,6 +61,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test that valid ssl options are being added to the configuration.
+     * @return void
      */
     public function testValidSslOptions()
     {
@@ -68,7 +71,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Provide invalid values for ssl options.
-     * @return array
+     * @return array<mixed>
      */
     public static function provideInvalidSslOptions()
     {
@@ -87,6 +90,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
     /**
      * Test that invalid ssl options will always result in null.
      * @param mixed $option
+     * @return void
      * @dataProvider provideInvalidSslOptions
      */
     public function testInvalidSslOptions($option)
@@ -97,7 +101,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Data provider for connection URLs and their parsed values.
-     * @return array
+     * @return array<mixed>
      */
     public static function provideConnectionUrl()
     {
@@ -115,6 +119,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      * @param string $scheme
      * @param string $host
      * @param int $port
+     * @return void
      * @dataProvider provideConnectionUrl
      */
     public function testConnectionUrl($url, $scheme, $host, $port)
@@ -127,6 +132,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test setting only certain log types.
+     * @return void
      */
     public function testSettingLogTypes()
     {
@@ -136,7 +142,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Data provider of invalid log types.
-     * @return array
+     * @return array<mixed>
      */
     public static function provideInvalidLogTypes()
     {
@@ -155,6 +161,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
     /**
      * Test setting only invalid log types resulting in enabling all log types.
      * @param mixed $types
+     * @return void
      * @dataProvider provideInvalidLogTypes
      */
     public function testInvalidLogTypes($types)
@@ -174,6 +181,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test creating a GELF message with all flags enabled.
+     * @return void
      */
     public function testCreatingLongMessage()
     {
@@ -203,6 +211,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test creating a GELF message without any appended debug information.
+     * @return void
      */
     public function testShortMessage()
     {
@@ -215,6 +224,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test getting a UDP transport class from default configuration.
+     * @return void
      */
     public function testUdpTransport()
     {
@@ -229,6 +239,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test getting a TCP transport class from default configuration.
+     * @return void
      */
     public function testTcpTransport()
     {
@@ -239,6 +250,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test getting a UDP transport class from default configuration.
+     * @return void
      */
     public function testTransportWrapper()
     {
@@ -251,6 +263,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      * Test getting an exception from an invalid scheme.
      * @expectedException \LogicException
      * @expectedExceptionMessage Unkown transport scheme for GreyLog!
+     * @return void
      */
     public function testInvalidScheme()
     {
@@ -260,6 +273,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test getting a publisher class from default configuration.
+     * @return void
      */
     public function testPublisher()
     {
@@ -274,6 +288,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test adding additional field.
+     * @return void
      */
     public function testAddingAdditionalFields()
     {
@@ -293,6 +308,7 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test creating a GELF message with all flags enabled.
+     * @return void
      */
     public function testNoEmptyPostInLongMessage()
     {

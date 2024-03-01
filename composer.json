@@ -5,7 +5,7 @@
     "license": "MIT",
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.2",
+        "php": ">7.2, <8.4",
         "ext-json": "*",
         "cakephp/cakephp": "^2.4",
         "graylog2/gelf-php": "^1.6",
@@ -28,5 +28,10 @@
             "Lib/Log/Engine/GraylogLog.php",
             "tests/PublicGraylogLog.php"
         ]
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true
+        }
     }
 }
