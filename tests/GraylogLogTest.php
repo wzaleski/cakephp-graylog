@@ -6,12 +6,13 @@ use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\SslOptions;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\UdpTransport;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
 /**
  * Class GraylogLogTest
  */
-class GraylogLogTest extends PHPUnit_Framework_TestCase
+class GraylogLogTest extends TestCase
 {
     /**
      * Test inheritance chain to ensure this test deals with the correct class.
@@ -147,25 +148,37 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
     public static function provideInvalidLogTypes()
     {
         return [
-            [['vUBTx40Vjr', 'WLWCTyCihX', 152, 4.256, true, false, null, ['debug'], new stdClass()]],
-            ['68KNtGxwon'],
-            [4391],
-            [87.7],
-            [true],
-            [false],
-            [null],
-            [new stdClass()]
+            [['vUBTx40Vjr', 'WLWCTyCihX', 152, 4.256, true, false, null, ['debug'], new stdClass()], 'add'],
+            ['68KNtGxwon', 'construct'],
+            [4391, 'construct'],
+            [87.7, 'construct'],
+            [true, 'construct'],
+            [false, 'construct'],
+            [null, 'construct'],
+            [new stdClass(), 'construct'],
         ];
     }
 
     /**
      * Test setting only invalid log types resulting in enabling all log types.
      * @param mixed $types
+     * @param string $exceptionType
      * @return void
      * @dataProvider provideInvalidLogTypes
      */
-    public function testInvalidLogTypes($types)
+    public function testInvalidLogTypes($types, $exceptionType)
     {
+        self::expectException("TypeError");
+
+        switch($exceptionType) {
+            case 'add':
+                self::expectExceptionMessage("kbATeam\GraylogUtilities\LogTypes::add(): Argument #1 (\$type) must be of type string");
+                break;
+            case 'construct':
+                self::expectExceptionMessage("kbATeam\GraylogUtilities\LogTypes::__construct(): Argument #1 (\$types) must be of type array");
+                break;
+        }
+
         $log = new PublicGraylogLog(['types' => $types]);
         static::assertSame([
             LogLevel::EMERGENCY,
@@ -204,9 +217,10 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
         static::assertSame(LogLevel::DEBUG, $message->getLevel());
         static::assertSame('mnfiXQoolR', $message->getShortMessage());
         static::assertSame([], $message->getAllAdditionals());
-        static::assertContains('POST:', $message->getFullMessage());
-        static::assertContains('Session:', $message->getFullMessage());
-        static::assertContains('Trace:', $message->getFullMessage());
+        static::assertStringContainsString('POST:', $message->getFullMessage());
+        static::assertStringContainsString('Session:', $message->getFullMessage());
+        static::assertStringContainsString('Trace:', $message->getFullMessage());
+        unset($_POST);
     }
 
     /**
@@ -261,12 +275,13 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test getting an exception from an invalid scheme.
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unkown transport scheme for GreyLog!
      * @return void
      */
     public function testInvalidScheme()
     {
+
+        self::expectException('LogicException');
+        self::expectExceptionMessage('Unknown transport scheme for GreyLog!');
         $log = new PublicGraylogLog(['scheme' => 'http']);
         $log->getTransport();
     }

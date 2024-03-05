@@ -222,7 +222,7 @@ class GraylogLog extends BaseLog
                 $this->_config['ssl_options']
             );
         }
-        throw new LogicException('Unkown transport scheme for GreyLog!');
+        throw new LogicException('Unknown transport scheme for GreyLog!');
     }
 
     /**

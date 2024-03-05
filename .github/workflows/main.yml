@@ -28,40 +28,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Check PHP syntax of config/phinx.php
+      - name: Check PHP syntax of plugin code
         run: php -l Lib/ tests/
 
   phpunit:
     name: PHPUnit tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php_version: [ 8.0, 8.1, 8.2 ]
     steps:
       - uses: actions/checkout@v3
       - uses: php-actions/composer@v6
         with:
-          php_version: 7.4
-      - uses: php-actions/phpunit@v3
-        with:
-          version: 4.8
-          php_version: 7.4
-          configuration: phpunit.xml
-          bootstrap: vendor/autoload.php
-          coverage_clover: clover.xml
+          php_version: ${{ matrix.php_version }}
+      - run: vendor/bin/phpunit --coverage-clover clover.xml
 
   # phpstan for several php versions
   phpstan:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php_version: [7.2, 7.4, 8.0, 8.1, 8.2]
+        php_version: [ 8.0, 8.1, 8.2 ]
     steps:
       - uses: actions/checkout@v3
       - uses: php-actions/composer@v6
         with:
-          php_version: 7.4
-          #php_extensions: redis intl
-
+          php_version: ${{ matrix.php_version }}
       - name: PHPStan Static Analysis
         uses: php-actions/phpstan@v3
         with:
           php_version: ${{ matrix.php_version }}
-          configuration: phpstan.neon
