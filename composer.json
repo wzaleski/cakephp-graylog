@@ -5,18 +5,18 @@
     "license": "MIT",
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.2",
+        "php": "^8.1",
         "ext-json": "*",
-        "cakephp/cakephp": "~3.6",
-        "graylog2/gelf-php": "^1.6",
+        "cakephp/cakephp": "~5.0",
+        "graylog2/gelf-php": "^2.0.1",
         "kba-team/php-backtrace": "^1.0",
-        "kba-team/graylog-utilities": "^1.0"
+        "kba-team/graylog-utilities": "^2.0.1"
     },
     "extra": {
         "installer-name": "Graylog"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7"
+        "phpunit/phpunit": "^9.0"
     },
     "autoload": {
         "psr-4": {
