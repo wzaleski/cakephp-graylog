@@ -16,7 +16,7 @@ namespace Gelf {
     class Publisher
     {
         /**
-         * @var TransportInterface
+         * @var TransportInterface|null
          */
         public $transport;
 
@@ -37,6 +37,7 @@ namespace Gelf {
         /**
          * @param MessageInterface $message
          * @noinspection PhpUnused
+         * @return void
          */
         public function publish(MessageInterface $message)
         {
@@ -51,6 +52,7 @@ namespace Tests\kbATeam\CakePhpGraylog {
     use Gelf\Transport\UdpTransport;
     use InvalidArgumentException;
     use LogicException;
+    use PHPUnit\Framework\Exception;
     use PHPUnit\Framework\TestCase;
     use PHPUnit_Framework_Exception;
     use PHPUnit_Framework_TestCase;
@@ -63,10 +65,11 @@ namespace Tests\kbATeam\CakePhpGraylog {
     {
         /**
          * Test writing a message using a fake publisher class.
-         * @throws PHPUnit_Framework_Exception
+         * @throws Exception
          * @throws InvalidArgumentException
          * @throws LogicException
          * @throws RuntimeException
+         * @return void
          */
         public function testWriteUsingFakePublisher()
         {

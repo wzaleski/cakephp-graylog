@@ -143,7 +143,7 @@ class GraylogLog extends BaseLog
      *
      * @param mixed   $level
      * @param string  $message
-     * @param array $context
+     * @param array<mixed> $context
      *
      * @return void
      *
@@ -259,6 +259,7 @@ class GraylogLog extends BaseLog
         /**
          * Create a debug backtrace.
          */
+        $trace = null;
         if ($add_file_and_line || $append_backtrace) {
             $trace = new ClassicBacktrace(
                 $this->getConfig('trace_level_offset'),
@@ -270,7 +271,7 @@ class GraylogLog extends BaseLog
          * In case the log didn't happen in memory (like with reflections), add
          * the filename and line to the message.
          */
-        if ($add_file_and_line && $trace->lastStep('file') !== null) {
+        if ($add_file_and_line && is_object($trace) && $trace->lastStep('file') !== null) {
             $gelfMessage->setAdditional('file', $trace->lastStep('file'));
             $gelfMessage->setAdditional('line', $trace->lastStep('line'));
         }
@@ -291,7 +292,7 @@ class GraylogLog extends BaseLog
         /**
          * Append backtrace in case it's not already in the message.
          */
-        if ($append_backtrace) {
+        if ($append_backtrace && is_object($trace)) {
             /**
              * Append backtrace to message.
              */
@@ -302,9 +303,13 @@ class GraylogLog extends BaseLog
         /**
          * Set function output as additional field.
          */
-        foreach ($this->getConfig('additional', []) as $key => $function) {
-            if (is_callable($function)) {
-                $gelfMessage->setAdditional($key, (string)$function());
+
+        $configStack = $this->getConfig('additional', []);
+        if (is_array($configStack)) {
+            foreach ($configStack as $key => $function) {
+                if (is_callable($function) && is_string($key)) {
+                    $gelfMessage->setAdditional($key, (string)$function());
+                }
             }
         }
 
@@ -321,7 +326,7 @@ class GraylogLog extends BaseLog
             return $gelfMessage->setShortMessage($shortMessage);
         }
         return $gelfMessage
-            ->setShortMessage($shortMessage)
+            ->setShortMessage((string)$shortMessage)
             ->setFullMessage($message);
     }
 }
