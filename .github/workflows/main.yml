@@ -42,6 +42,8 @@ jobs:
       - uses: php-actions/composer@v6
         with:
           php_version: ${{ matrix.php_version }}
+          php_extensions: intl
+
       - run: vendor/bin/phpunit
 
   # phpstan for several php versions
