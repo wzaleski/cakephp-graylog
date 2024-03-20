@@ -35,9 +35,9 @@ class GraylogLog extends BaseLog
     private $loop = false;
 
     /**
-     * @var array Configuration array containing sane defaults.
+     * @var array<string, mixed> $_config Configuration array containing sane defaults.
      */
-    protected $_config = [
+    protected array $_config = [
         'scheme' => 'udp',
         'host' => '127.0.0.1',
         'port' => 12201,
@@ -242,7 +242,7 @@ class GraylogLog extends BaseLog
         $gelfMessage = (new GelfMessage())
             ->setVersion('1.1')
             ->setLevel($level)
-            ->setFacility($this->getConfig('facility', 'CakePHP'));
+            ->setAdditional('facility', $this->getConfig('facility', 'CakePHP'));
         if (PHP_SAPI !== 'cli' && ($request = Router::getRequest()) !== null) {
             $referer = $request->referer(true);
             if (!empty($referer)) {
@@ -271,8 +271,8 @@ class GraylogLog extends BaseLog
          * the filename and line to the message.
          */
         if ($add_file_and_line && $trace->lastStep('file') !== null) {
-            $gelfMessage->setFile($trace->lastStep('file'));
-            $gelfMessage->setFile($trace->lastStep('line'));
+            $gelfMessage->setAdditional('file', $trace->lastStep('file'));
+            $gelfMessage->setAdditional('line', $trace->lastStep('line'));
         }
 
         /**

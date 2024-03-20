@@ -12,9 +12,8 @@ use Gelf\Transport\UdpTransport;
 use InvalidArgumentException;
 use kbATeam\CakePhpGraylog\Log\Engine\GraylogLog;
 use LogicException;
-use PHPUnit_Framework_AssertionFailedError;
-use PHPUnit_Framework_Exception;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use RuntimeException;
@@ -23,11 +22,11 @@ use stdClass;
 /**
  * Class GraylogLogTest
  */
-class GraylogLogTest extends PHPUnit_Framework_TestCase
+class GraylogLogTest extends TestCase
 {
     /**
      * Test inheritance chain to ensure this test deals with the correct class.
-     * @throws PHPUnit_Framework_Exception
+     * @throws Exception
      */
     public function testInheritance()
     {
@@ -178,10 +177,11 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
      * Test setting only invalid log levels resulting in enabling all log levels.
      * @param mixed $levels
      * @dataProvider provideInvalidLogLevels
-     * @throws InvalidArgumentException
      */
     public function testInvalidLogLevels($levels)
     {
+        $this->expectException(\TypeError::class);
+
         $log = new PublicGraylogLog(['levels' => $levels]);
         static::assertSame([
             LogLevel::EMERGENCY,
@@ -222,13 +222,14 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
         ]);
         $message = $log->createMessage(LogLevel::DEBUG, 'mnfiXQoolR');
         static::assertInstanceOf(GelfMessage::class, $message);
-        static::assertSame('CakePHP', $message->getFacility());
+        static::assertSame('CakePHP', $message->getAdditional('facility'));
         static::assertSame(LogLevel::DEBUG, $message->getLevel());
         static::assertSame('mnfiXQoolR', $message->getShortMessage());
-        static::assertSame([], $message->getAllAdditionals());
-        static::assertContains('POST:', $message->getFullMessage());
-        static::assertContains('Session:', $message->getFullMessage());
-        static::assertContains('Trace:', $message->getFullMessage());
+        static::assertCount(3, $message->getAllAdditionals());
+        static::assertStringContainsString('POST:', $message->getFullMessage());
+        static::assertStringContainsString('Session:', $message->getFullMessage());
+        static::assertStringContainsString('Trace:', $message->getFullMessage());
+        unset($_POST);
     }
 
     /**
@@ -356,10 +357,10 @@ class GraylogLogTest extends PHPUnit_Framework_TestCase
         ]);
         $message = $log->createMessage(LogLevel::CRITICAL, 'oP6MkuApf9');
         static::assertInstanceOf(GelfMessage::class, $message);
-        static::assertSame('CakePHP', $message->getFacility());
+        static::assertSame('CakePHP', $message->getAdditional('facility'));
         static::assertSame(LogLevel::CRITICAL, $message->getLevel());
         static::assertSame('oP6MkuApf9', $message->getShortMessage());
-        static::assertSame([], $message->getAllAdditionals());
+        static::assertCount(3, $message->getAllAdditionals());
         static::assertNull($message->getFullMessage());
     }
 }
