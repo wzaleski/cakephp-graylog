@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php_version: [8.0, 8.1, 8.2]
+        php_version: [ 8.0, 8.1, 8.2 ]
     steps:
       - uses: actions/checkout@v3
       - uses: php-actions/composer@v6
@@ -47,19 +47,18 @@ jobs:
       - run: vendor/bin/phpunit
 
   # phpstan for several php versions
-#  phpstan:
-#    runs-on: ubuntu-latest
-#    strategy:
-#      matrix:
-#        php_version: [8.0, 8.1, 8.2]
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: php-actions/composer@v6
-#        with:
-#          php_version: ${{ matrix.php_version }}
-#      - name: PHPStan Static Analysis
-#        uses: php-actions/phpstan@v3
-#        with:
-#          php_version: ${{ matrix.php_version }}
-#          configuration: phpstan.neon
-#
+  phpstan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php_version: [ 8.0, 8.1, 8.2 ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: php-actions/composer@v6
+        with:
+          php_version: ${{ matrix.php_version }}
+      - name: PHPStan Static Analysis
+        uses: php-actions/phpstan@v3
+        with:
+          php_version: ${{ matrix.php_version }}
+          configuration: phpstan.neon
