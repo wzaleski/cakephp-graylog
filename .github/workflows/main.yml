@@ -57,6 +57,7 @@ jobs:
       - uses: php-actions/composer@v6
         with:
           php_version: ${{ matrix.php_version }}
+          php_extensions: intl
       - name: PHPStan Static Analysis
         uses: php-actions/phpstan@v3
         with:
