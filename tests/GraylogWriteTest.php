@@ -16,7 +16,7 @@ namespace Gelf {
     class Publisher
     {
         /**
-         * @var TransportInterface
+         * @var TransportInterface|null
          */
         public $transport;
 
@@ -37,6 +37,7 @@ namespace Gelf {
         /**
          * @param MessageInterface $message
          * @noinspection PhpUnused
+         * @return void
          */
         public function publish(MessageInterface $message)
         {
@@ -51,6 +52,8 @@ namespace Tests\kbATeam\CakePhpGraylog {
     use Gelf\Transport\UdpTransport;
     use InvalidArgumentException;
     use LogicException;
+    use PHPUnit\Framework\Exception;
+    use PHPUnit\Framework\TestCase;
     use PHPUnit_Framework_Exception;
     use PHPUnit_Framework_TestCase;
     use RuntimeException;
@@ -58,14 +61,15 @@ namespace Tests\kbATeam\CakePhpGraylog {
     /**
      * Class GraylogWriteTest
      */
-    class GraylogWriteTest extends PHPUnit_Framework_TestCase
+    class GraylogWriteTest extends TestCase
     {
         /**
          * Test writing a message using a fake publisher class.
-         * @throws PHPUnit_Framework_Exception
+         * @throws Exception
          * @throws InvalidArgumentException
          * @throws LogicException
          * @throws RuntimeException
+         * @return void
          */
         public function testWriteUsingFakePublisher()
         {
@@ -85,11 +89,20 @@ namespace Tests\kbATeam\CakePhpGraylog {
             static::assertNull($publisher->message);
             $log->log('error', 'P5oUZLqcjx');
             static::assertInstanceOf(GelfMessage::class, $publisher->message);
-            static::assertSame('CakePHP', $publisher->message->getFacility());
+            static::assertSame('CakePHP', $publisher->message->getAdditional('facility'));
             static::assertSame('error', $publisher->message->getLevel());
             static::assertSame('P5oUZLqcjx', $publisher->message->getShortMessage());
             static::assertNull($publisher->message->getFullMessage());
-            static::assertSame([], $publisher->message->getAllAdditionals());
+            static::assertCount(1, $publisher->message->getAllAdditionals());
+
+            /**
+            $expected = [
+                'facility' => 'CakePHP',
+                'file' => '/app/vendor/phpunit/phpunit/src/Framework/TestCase.php',
+               'line' => 1612,
+            ];
+            static::assertSame($expected, $publisher->message->getAllAdditionals());
+             */
         }
     }
 }

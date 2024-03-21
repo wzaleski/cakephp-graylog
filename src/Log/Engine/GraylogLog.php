@@ -35,9 +35,9 @@ class GraylogLog extends BaseLog
     private $loop = false;
 
     /**
-     * @var array Configuration array containing sane defaults.
+     * @var array<string, mixed> $_config Configuration array containing sane defaults.
      */
-    protected $_config = [
+    protected array $_config = [
         'scheme' => 'udp',
         'host' => '127.0.0.1',
         'port' => 12201,
@@ -45,7 +45,6 @@ class GraylogLog extends BaseLog
         'chunk_size' => UdpTransport::CHUNK_SIZE_LAN,
         'ssl_options' => null,
         'facility' => 'CakePHP',
-        'add_file_and_line' => true,
         'append_backtrace' => false,
         'append_session' => false,
         'append_post' => false,
@@ -143,7 +142,7 @@ class GraylogLog extends BaseLog
      *
      * @param mixed   $level
      * @param string  $message
-     * @param array $context
+     * @param array<mixed> $context
      *
      * @return void
      *
@@ -242,7 +241,7 @@ class GraylogLog extends BaseLog
         $gelfMessage = (new GelfMessage())
             ->setVersion('1.1')
             ->setLevel($level)
-            ->setFacility($this->getConfig('facility', 'CakePHP'));
+            ->setAdditional('facility', $this->getConfig('facility', 'CakePHP'));
         if (PHP_SAPI !== 'cli' && ($request = Router::getRequest()) !== null) {
             $referer = $request->referer(true);
             if (!empty($referer)) {
@@ -250,7 +249,7 @@ class GraylogLog extends BaseLog
             }
             $gelfMessage->setAdditional('request_uri', $request->getRequestTarget());
         }
-        $add_file_and_line = $this->getConfig('add_file_and_line', true) === true;
+
         /**
          * Append backtrace in case it's not already in the message.
          */
@@ -259,20 +258,12 @@ class GraylogLog extends BaseLog
         /**
          * Create a debug backtrace.
          */
-        if ($add_file_and_line || $append_backtrace) {
+        $trace = null;
+        if ($append_backtrace) {
             $trace = new ClassicBacktrace(
                 $this->getConfig('trace_level_offset'),
                 $this->getConfig('file_root_dir')
             );
-        }
-
-        /**
-         * In case the log didn't happen in memory (like with reflections), add
-         * the filename and line to the message.
-         */
-        if ($add_file_and_line && $trace->lastStep('file') !== null) {
-            $gelfMessage->setFile($trace->lastStep('file'));
-            $gelfMessage->setFile($trace->lastStep('line'));
         }
 
         /**
@@ -291,7 +282,7 @@ class GraylogLog extends BaseLog
         /**
          * Append backtrace in case it's not already in the message.
          */
-        if ($append_backtrace) {
+        if ($append_backtrace && is_object($trace)) {
             /**
              * Append backtrace to message.
              */
@@ -302,9 +293,13 @@ class GraylogLog extends BaseLog
         /**
          * Set function output as additional field.
          */
-        foreach ($this->getConfig('additional', []) as $key => $function) {
-            if (is_callable($function)) {
-                $gelfMessage->setAdditional($key, (string)$function());
+
+        $configStack = $this->getConfig('additional', []);
+        if (is_array($configStack)) {
+            foreach ($configStack as $key => $function) {
+                if (is_callable($function) && is_string($key)) {
+                    $gelfMessage->setAdditional($key, (string)$function());
+                }
             }
         }
 
@@ -321,7 +316,7 @@ class GraylogLog extends BaseLog
             return $gelfMessage->setShortMessage($shortMessage);
         }
         return $gelfMessage
-            ->setShortMessage($shortMessage)
+            ->setShortMessage((string)$shortMessage)
             ->setFullMessage($message);
     }
 }
