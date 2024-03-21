@@ -229,7 +229,7 @@ class GraylogLogTest extends TestCase
         $this->assertSame('CakePHP', $message->getAdditional('facility'));
         $this->assertSame(LogLevel::DEBUG, $message->getLevel());
         $this->assertSame('mnfiXQoolR', $message->getShortMessage());
-        $this->assertCount(3, $message->getAllAdditionals());
+        $this->assertCount(1, $message->getAllAdditionals());
         $this->assertStringContainsString('POST:', (string)$message->getFullMessage());
         $this->assertStringContainsString('Session:', (string)$message->getFullMessage());
         $this->assertStringContainsString('Trace:', (string)$message->getFullMessage());
@@ -372,7 +372,7 @@ class GraylogLogTest extends TestCase
         $this->assertSame('CakePHP', $message->getAdditional('facility'));
         $this->assertSame(LogLevel::CRITICAL, $message->getLevel());
         $this->assertSame('oP6MkuApf9', $message->getShortMessage());
-        $this->assertCount(3, $message->getAllAdditionals());
+        $this->assertCount(1, $message->getAllAdditionals());
         $this->assertNull($message->getFullMessage());
     }
 }

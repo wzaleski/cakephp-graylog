@@ -93,7 +93,7 @@ namespace Tests\kbATeam\CakePhpGraylog {
             static::assertSame('error', $publisher->message->getLevel());
             static::assertSame('P5oUZLqcjx', $publisher->message->getShortMessage());
             static::assertNull($publisher->message->getFullMessage());
-            static::assertCount(3, $publisher->message->getAllAdditionals());
+            static::assertCount(1, $publisher->message->getAllAdditionals());
 
             /**
             $expected = [
