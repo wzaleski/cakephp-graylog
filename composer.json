@@ -35,6 +35,9 @@
       "tests/PublicGraylogLog.php"
     ]
   },
+  "extra": {
+    "installer-name": "Graylog"
+  },
   "config": {
     "allow-plugins": {
       "composer/installers": true
