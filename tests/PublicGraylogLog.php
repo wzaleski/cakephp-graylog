@@ -1,5 +1,9 @@
 <?php
 
+use Gelf\Publisher;
+use Gelf\Transport\TransportInterface;
+use Gelf\Message as GelfMessage;
+
 /**
  * Class PublicGraylogLog
  * Class with the sole purpose to make the config array public for testing.
@@ -11,7 +15,7 @@ class PublicGraylogLog extends GraylogLog
      * @param string $key
      * @return array|mixed
      */
-    public function getConfig($key = null)
+    public function getConfig(?string $key = null): mixed
     {
         if ($key === null) {
             return $this->_config;
@@ -22,7 +26,7 @@ class PublicGraylogLog extends GraylogLog
     /**
      * @inheritDoc
      */
-    public function getPublisher()
+    public function getPublisher(): Publisher
     {
         return parent::getPublisher();
     }
@@ -30,7 +34,7 @@ class PublicGraylogLog extends GraylogLog
     /**
      * @inheritDoc
      */
-    public function getTransport()
+    public function getTransport(): TransportInterface
     {
         return parent::getTransport();
     }
@@ -38,7 +42,7 @@ class PublicGraylogLog extends GraylogLog
     /**
      * @inheritDoc
      */
-    public function createMessage($type, $message)
+    public function createMessage(string $type, string $message): GelfMessage
     {
         return parent::createMessage($type, $message);
     }

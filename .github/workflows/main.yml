@@ -15,47 +15,55 @@ on:
 jobs:
   # Composer config validation
   composer:
-    name: Composer config validation
-    runs-on: ubuntu-latest
+    name: "Composer config validation"
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v3
-      - name: Validate composer.json
-        run: composer validate --strict
+      - uses: "actions/checkout@v3"
+      - name: "Validate composer.json"
+        run: "composer validate --strict"
 
   # PHP syntax validation
   php:
-    name: PHP syntax validation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Check PHP syntax of plugin code
-        run: php -l Lib/ tests/
-
-  phpunit:
-    name: PHPUnit tests
-    runs-on: ubuntu-latest
+    name: "PHP syntax validation"
+    runs-on: "ubuntu-latest"
     strategy:
       matrix:
         php_version: [ 8.0, 8.1, 8.2 ]
     steps:
-      - uses: actions/checkout@v3
-      - uses: php-actions/composer@v6
+      - uses: "actions/checkout@v3"
+      - uses: "shivammathur/setup-php@v2"
         with:
-          php_version: ${{ matrix.php_version }}
-      - run: vendor/bin/phpunit --coverage-clover clover.xml
+          php-version: "${{ matrix.php_version }}"
+      - name: "Check PHP syntax of plugin code"
+        run:  |
+          php -l Lib/
+          php -l tests/
+
+  phpunit:
+    name: "PHPUnit tests"
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        php_version: [ 8.0, 8.1, 8.2 ]
+    steps:
+      - uses: "actions/checkout@v3"
+      - uses: "php-actions/composer@v6"
+        with:
+          php_version: "${{ matrix.php_version }}"
+      - run: "vendor/bin/phpunit --coverage-clover clover.xml"
 
   # phpstan for several php versions
   phpstan:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     strategy:
       matrix:
         php_version: [ 8.0, 8.1, 8.2 ]
     steps:
-      - uses: actions/checkout@v3
-      - uses: php-actions/composer@v6
+      - uses: "actions/checkout@v3"
+      - uses: "php-actions/composer@v6"
         with:
-          php_version: ${{ matrix.php_version }}
-      - name: PHPStan Static Analysis
-        uses: php-actions/phpstan@v3
+          php_version: "${{ matrix.php_version }}"
+      - name: "PHPStan Static Analysis"
+        uses: "php-actions/phpstan@v3"
         with:
-          php_version: ${{ matrix.php_version }}
+          php_version: "${{ matrix.php_version }}"

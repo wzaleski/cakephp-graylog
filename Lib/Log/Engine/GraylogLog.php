@@ -162,7 +162,7 @@ class GraylogLog extends BaseLog
      * @throws \LogicException
      * @throws \InvalidArgumentException
      */
-    protected function getPublisher()
+    protected function getPublisher(): Publisher
     {
         if ($this->publisher === null) {
             $this->publisher = new Publisher($this->getTransport());
@@ -175,7 +175,7 @@ class GraylogLog extends BaseLog
      * @throws \LogicException
      * @throws \InvalidArgumentException
      */
-    protected function getTransport()
+    protected function getTransport(): TransportInterface
     {
         if ($this->transport === null) {
             $this->transport = $this->initTransport();
@@ -191,7 +191,7 @@ class GraylogLog extends BaseLog
      * @throws InvalidArgumentException
      * @throws LogicException
      */
-    private function initTransport()
+    private function initTransport(): TransportInterface
     {
         if ($this->_config['ignore_transport_errors'] === false) {
             return $this->buildTransport();
@@ -205,7 +205,7 @@ class GraylogLog extends BaseLog
      * @throws \LogicException Connection scheme configuration error.
      * @throws \InvalidArgumentException UdpTransport or TcpTransport config errors.
      */
-    private function buildTransport()
+    private function buildTransport(): AbstractTransport
     {
         if ($this->_config['scheme'] === 'udp') {
             return new UdpTransport(
@@ -231,7 +231,7 @@ class GraylogLog extends BaseLog
      * @return GelfMessage
      * @throws \RuntimeException
      */
-    protected function createMessage($type, $message)
+    protected function createMessage(string $type, string $message): GelfMessage
     {
         $gelfMessage = (new GelfMessage())
             ->setVersion('1.1')

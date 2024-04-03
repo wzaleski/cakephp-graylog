@@ -59,7 +59,7 @@ namespace {
          * Test writing a message using a fake publisher class.
          * @return void
          */
-        public function testWriteUsingFakePublisher()
+        public function testWriteUsingFakePublisher(): void
         {
             $log = new PublicGraylogLog([
                 'append_backtrace' => false,

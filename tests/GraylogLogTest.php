@@ -196,7 +196,7 @@ class GraylogLogTest extends TestCase
      * Test creating a GELF message with all flags enabled.
      * @return void
      */
-    public function testCreatingLongMessage()
+    public function testCreatingLongMessage(): void
     {
         $_POST = [
             'PAYy2EKmuW' => 'E8RUOjsjAn'
@@ -227,7 +227,7 @@ class GraylogLogTest extends TestCase
      * Test creating a GELF message without any appended debug information.
      * @return void
      */
-    public function testShortMessage()
+    public function testShortMessage(): void
     {
         $log = new PublicGraylogLog();
         $message = $log->createMessage(LogLevel::ALERT, 'oIEUMcF1Ce');
@@ -240,7 +240,7 @@ class GraylogLogTest extends TestCase
      * Test getting a UDP transport class from default configuration.
      * @return void
      */
-    public function testUdpTransport()
+    public function testUdpTransport(): void
     {
         $log = new PublicGraylogLog(['ignore_transport_errors' => false]);
         $transport = $log->getTransport();
@@ -255,7 +255,7 @@ class GraylogLogTest extends TestCase
      * Test getting a TCP transport class from default configuration.
      * @return void
      */
-    public function testTcpTransport()
+    public function testTcpTransport(): void
     {
         $log = new PublicGraylogLog(['scheme' => 'tcp', 'ignore_transport_errors' => false]);
         $transport = $log->getTransport();
@@ -266,7 +266,7 @@ class GraylogLogTest extends TestCase
      * Test getting a UDP transport class from default configuration.
      * @return void
      */
-    public function testTransportWrapper()
+    public function testTransportWrapper(): void
     {
         $log = new PublicGraylogLog();
         $transport = $log->getTransport();
@@ -277,7 +277,7 @@ class GraylogLogTest extends TestCase
      * Test getting an exception from an invalid scheme.
      * @return void
      */
-    public function testInvalidScheme()
+    public function testInvalidScheme(): void
     {
 
         self::expectException('LogicException');
@@ -290,7 +290,7 @@ class GraylogLogTest extends TestCase
      * Test getting a publisher class from default configuration.
      * @return void
      */
-    public function testPublisher()
+    public function testPublisher(): void
     {
         $log = new PublicGraylogLog();
         $publisher = $log->getPublisher();
@@ -305,7 +305,7 @@ class GraylogLogTest extends TestCase
      * Test adding additional field.
      * @return void
      */
-    public function testAddingAdditionalFields()
+    public function testAddingAdditionalFields(): void
     {
         $log = new PublicGraylogLog([
             'additional' => [
@@ -325,7 +325,7 @@ class GraylogLogTest extends TestCase
      * Test creating a GELF message with all flags enabled.
      * @return void
      */
-    public function testNoEmptyPostInLongMessage()
+    public function testNoEmptyPostInLongMessage(): void
     {
         $_SESSION = [
             'edjjLLLg14' => 'G78eIm8UbE'
