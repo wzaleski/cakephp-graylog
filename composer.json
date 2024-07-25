@@ -5,7 +5,7 @@
     "license": "MIT",
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.2",
+        "php": "^8.3",
         "ext-json": "*",
         "cakephp/cakephp": "^4.3",
         "graylog2/gelf-php": "^1.6",
